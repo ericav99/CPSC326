@@ -70,16 +70,31 @@ class DistanceCalculator(object):
             raise Exception("invalid number '%s'" % num)
     
     
+    def __update_coords(self, command, num):
+        """Updates the x and y values according to a command"""
+        if command == self.UP_KEYWORD:
+            self.y += num
+        elif command == self.DOWN_KEYWORD:
+            self.y -= num
+        elif command == self.LEFT_KEYWORD:
+            self.x -= num
+        elif command == self.RIGHT_KEYWORD:
+            self.x += num
+        else:
+            raise Exception("invalid number '%s'" % num)
+    
+    
     def __parse(self):
         """Reads commands from input stream, updating x and y coordinates"""
         # TODO: implement this method using __parse_space(),
         # __parse_command(), __parse_num(), __read(), and __peek()
-        while(self.__peek() != ""):
-            print(self.__parse_command())
-            self.__parse_space()
-            print(self.__parse_num())
+        while(self.__peek() != ""): # if peek() returns 0B, it's the end of the file
+            command = self.__parse_command() # command
+            self.__parse_space() # space between command and number
+            num = self.__parse_num() # number
             self.__read(1) # semicolon
-            self.__parse_space()
+            self.__parse_space() # space after semicolon
+            self.__update_coords(command, num) # update x and y
     
     
     def distance(self):
