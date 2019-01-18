@@ -59,10 +59,7 @@ class DistanceCalculator(object):
     def __parse_num(self):
         """Reads an integer string from the stream"""
         num = ''
-        if self.__peek() == "-":
-            num += self.__read(1)
-        
-        while self.__peek().isdigit():
+        while not self.__peek().isspace() and not self.__peek() == ";":
             num += self.__read(1)
         try:
             return int(num)
@@ -81,16 +78,16 @@ class DistanceCalculator(object):
         elif command == self.RIGHT_KEYWORD:
             self.x += num
         else:
-            raise Exception("invalid number '%s'" % num)
+            raise Exception("invalid command '%s'" % command)
     
     
     def __parse(self):
         """Reads commands from input stream, updating x and y coordinates"""
-        # TODO: implement this method using __parse_space(),
-        # __parse_command(), __parse_num(), __read(), and __peek()
         while(self.__peek() != ""): # if peek() returns 0B, it's the end of the file
             command = self.__parse_command() # command
             self.__parse_space() # space between command and number
+            if ";" in command:
+                raise Exception("malformed command")
             num = self.__parse_num() # number
             self.__read(1) # semicolon
             self.__parse_space() # space after semicolon
@@ -105,10 +102,9 @@ class DistanceCalculator(object):
 
 def main(filename):
     try:
-        f = open(filename, 'r')
-        d = DistanceCalculator(f)
-        print('Euclidean distance: %.2f' % d.distance())
-        f.close()
+        with open(filename, 'r') as f:
+            d = DistanceCalculator(f)
+            print('Euclidean distance: %.2f' % d.distance())
     except FileNotFoundError:
         sys.exit('invalid filename %s' % filename)
     except Exception as e:
