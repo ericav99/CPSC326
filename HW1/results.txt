@@ -1,5 +1,11 @@
 test-allcommands.txt   - (0, 0): 0.00
-test-badcommands.txt   - exception, because "out" is not a command
+test-badcommands1.txt  - exception, because "out" is not a command
+test-badcommands2.txt  - exception, because there were two semicolons
+test-badcommands3.txt  - exception, because there is a missing semicolon
+test-badcommands4.txt  - exception, because of a command with a second command instead of a number
+test-badcommands5.txt  - exception, because a command had no number
+test-badcommands6.txt  - exception, because a number existed without a command
+test-badcommands7.txt  - exception, because a semicolon followed no command
 test-badnumbers1.txt   - exception, because "X" is not a number
 test-badnumbers2.txt   - exception, because "1a" is not a number
 test-decimals.txt      - exception, because "0.5" is not an integer

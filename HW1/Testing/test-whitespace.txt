@@ -1,9 +1,10 @@
-right 1;   up      2;
+right 1;   up      2  ;
 
 
 
 up 
-1;
+1
+;
 
 
 

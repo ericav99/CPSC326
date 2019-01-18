@@ -10,6 +10,7 @@
 #     up n;
 #     down n;
 #   where n is an integer, and computes the resulting Euclidean distance.
+#   This program can handle varied whitespace, but can only use integers. 
 #-------------------------------------------------------------------------
 
 import sys
@@ -89,7 +90,11 @@ class DistanceCalculator(object):
             if ";" in command:
                 raise Exception("malformed command")
             num = self.__parse_num() # number
-            self.__read(1) # semicolon
+            self.__parse_space() # if there are spaces between number and semicolon
+            if self.__peek() == ";":
+                self.__read(1) # semicolon
+            else:
+                raise Exception("missing semicolon")
             self.__parse_space() # space after semicolon
             self.__update_coords(command, num) # update x and y
     
