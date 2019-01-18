@@ -17,6 +17,10 @@ import math
 
 class DistanceCalculator(object):
     """Computes the Euclidean distance from a file of basic moves"""
+    UP_KEYWORD = "up"
+    DOWN_KEYWORD = "down"
+    LEFT_KEYWORD = "left"
+    RIGHT_KEYWORD = "right"
     
     def __init__(self, input_stream):
         self.input_stream = input_stream
@@ -38,13 +42,13 @@ class DistanceCalculator(object):
         return self.input_stream.read(n)
     
     
-    def parse_space(self):
+    def __parse_space(self):
         """Reads sequence of whitespace characters"""
         while self.__peek().isspace():
             self.__read(1)
     
     
-    def parse_command(self):
+    def __parse_command(self):
         """Reads and returns a sequence of non whitespace characters"""
         command = ''
         while not self.__peek().isspace():
@@ -55,7 +59,11 @@ class DistanceCalculator(object):
     def __parse_num(self):
         """Reads an integer string from the stream"""
         num = ''
-        # TODO: read the int string into the num variable
+        if self.__peek() == "-":
+            num += self.__read(1)
+        
+        while self.__peek().isdigit():
+            num += self.__read(1)
         try:
             return int(num)
         except Exception:
@@ -66,6 +74,12 @@ class DistanceCalculator(object):
         """Reads commands from input stream, updating x and y coordinates"""
         # TODO: implement this method using __parse_space(),
         # __parse_command(), __parse_num(), __read(), and __peek()
+        while(self.__peek() != ""):
+            print(self.__parse_command())
+            self.__parse_space()
+            print(self.__parse_num())
+            self.__read(1) # semicolon
+            self.__parse_space()
     
     
     def distance(self):
