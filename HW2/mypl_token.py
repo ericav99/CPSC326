@@ -60,4 +60,4 @@ class Token(object):
         self.column = column
     
     def __str__(self):
-        return self.tokentype + " '" + self.lexeme + "' " + self.line + ":" + self.column
+        return self.tokentype + " '" + self.lexeme + "' " + str(self.line) + ":" + str(self.column)
