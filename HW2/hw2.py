@@ -24,12 +24,15 @@ def main(filename):
         sys.exit(e)
 
 def hw2(file_stream):
-    the_lexer = lexer.Lexer(file_stream)
-    the_token = the_lexer.next_token()
-    while the_token.tokentype != token.EOS:
-        print(the_token)
+    try:
+        the_lexer = lexer.Lexer(file_stream)
         the_token = the_lexer.next_token()
-    print(the_token)
+        while the_token.tokentype != token.EOS:
+            print(the_token)
+            the_token = the_lexer.next_token()
+        print(the_token)
+    except Exception as e:
+        print(e)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

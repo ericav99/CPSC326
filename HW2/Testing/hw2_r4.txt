@@ -1,0 +1,1 @@
+error: unexpected symbol "1" at line 2 column 1
