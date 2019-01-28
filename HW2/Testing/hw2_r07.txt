@@ -1,0 +1,1 @@
+error: unexpected symbol "[" at line 2 column 1

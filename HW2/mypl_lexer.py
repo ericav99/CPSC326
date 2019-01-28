@@ -37,8 +37,9 @@ class Lexer(object):
         elif peekValue.isdigit():
             curr_lexeme = self.__read()
             isFloat = False
-            while self.__peek().isdigit() or self.__peek().isalpha() or self.__peek() == ".":
-                if self.__peek().isalpha():
+            # while self.__peek().isdigit() or self.__peek().isalpha() or self.__peek() == ".":
+            while self.__peek() not in ";=+-*/%<>()":
+                if not self.__peek().isdigit() and self.__peek() != ".":
                     raise error.MyPLError('unexpected symbol "' + self.__peek() + '"', self.line, self.column - (len(curr_lexeme) - 1))
                 elif self.__peek() == "." and not isFloat:
                     # check if first part of float is intval
@@ -47,7 +48,7 @@ class Lexer(object):
                     else:
                         raise error.MyPLError("float starts with invalid int", self.line, self.column - (len(curr_lexeme) - 1)) # 1 higher because line nubmer starts at 1
                 elif self.__peek() == "." and isFloat:
-                    raise error.MyPLError("two decimal points in one number", self.line, self.column - (len(curr_lexeme) - 1))
+                    raise error.MyPLError("two decimal points in one number", self.line, self.column)
                 curr_lexeme += self.__read()
             if isFloat:
                 if curr_lexeme[-1] == ".": # if there is nothing after the decimal point
@@ -134,7 +135,7 @@ class Lexer(object):
                 self.__read()
                 return token.Token(token.STRINGVAL, curr_lexeme, self.line, self.column - (len(curr_lexeme) - 1) - 2) # -2 to account for quotes
             elif self.__peek() == "\n":
-                raise error.MyPLError("unexpected newline in string", self.line, self.column)
+                raise error.MyPLError("missing closing quotes on string value", self.line, self.column)
             else:
                 raise error.MyPLError("something strange happened", self.line, self.column)
         elif peekValue == "#":
@@ -200,4 +201,4 @@ class Lexer(object):
             self.__read()
             return token.Token(token.PLUS, "+", self.line, self.column)
         else:
-            raise error.MyPLError("something strange happened", self.line, self.column)
+            raise error.MyPLError('unexpected symbol "' + peekValue + '"', self.line, self.column)

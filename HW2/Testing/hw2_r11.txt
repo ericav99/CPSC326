@@ -1,0 +1,1 @@
+error: missing closing quotes on string value at line 2 column 6
