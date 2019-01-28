@@ -34,19 +34,22 @@ class Lexer(object):
             isFloat = False
             while self.__peek().isdigit() or self.__peek() == ".":
                 if self.__peek() == "." and not isFloat:
-                    # check if first part is intval
-                    if (curr_lexeme[0] == "0" and len(curr_lexeme) == 1) or curr_lexeme[0] != "0" and len(curr_lexeme) > 1:
+                    # check if first part of float is intval
+                    if len(curr_lexeme) == 1 or (curr_lexeme[0] != "0" and len(curr_lexeme)) > 1:
                         isFloat = True
                     else:
-                        raise error.MyPLError("float starts with 0", self.line, self.column)
+                        raise error.MyPLError("float starts with invalid int", self.line, self.column)
                 elif self.__peek() == "." and isFloat:
                     raise error.MyPLError("two decimal points in one number", self.line, self.column)
-                # safe zone from here down
-                curr_lexeme += self.read()
+                curr_lexeme += self.__read()
             if isFloat:
                 return token.Token(token.FLOATVAL, float(curr_lexeme), self.line, self.column)
             else:
-                return token.Token(token.INTVAL, int(curr_lexeme), self.line, self.column)
+                # check if int is intval
+                if len(curr_lexeme) == 1 or (curr_lexeme[0] != "0" and len(curr_lexeme) > 1):
+                    return token.Token(token.INTVAL, int(curr_lexeme), self.line, self.column)
+                else:
+                    raise error.MyPLError("invalid int", self.line, self.column)
                 
         elif peekValue.isalpha():
             curr_lexeme = self.__read()
@@ -122,6 +125,10 @@ class Lexer(object):
                 raise error.MyPLError("unexpected newline in string", self.line, self.column)
             else:
                 raise error.MyPLError("something strange happened", self.line, self.column)
+        elif peekValue == "#":
+            while self.__peek() != "\n":
+                self.__read()
+            return self.next_token()
         elif peekValue == "=":
             self.__read()
             if self.__peek() == "=":
@@ -171,6 +178,14 @@ class Lexer(object):
         elif peekValue == "-":
             self.__read()
             return token.Token(token.MINUS, "-", self.line, self.column)
+        elif peekValue == "%":
+            self.__read()
+            return token.Token(token.MODULO, "%", self.line, self.column)
+        elif peekValue == "*":
+            self.__read()
+            return token.Token(token.MULTIPLY, "*", self.line, self.column)
         elif peekValue == "+":
             self.__read()
             return token.Token(token.PLUS, "+", self.line, self.column)
+        else:
+            raise error.MyPLError("something strange happened", self.line, self.column)
