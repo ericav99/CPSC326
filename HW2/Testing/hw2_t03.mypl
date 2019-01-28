@@ -1,0 +1,6 @@
+# good variations
+5;
+x=5.0;
+x=0;
+print("Hello World!\n");
+if(x<=5 or y>=6)and(not(x!=6))then print(toStr(x)+"\n");end

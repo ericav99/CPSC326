@@ -1,1 +1,2 @@
-invalid filename Testing/hw2_t12.mypl
+ID 'x' 2:1
+error: unexpected symbol "!" at line 2 column 2
