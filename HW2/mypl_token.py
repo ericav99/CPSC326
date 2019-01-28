@@ -1,4 +1,3 @@
-#
 # Author: Maxwell Sherman
 # Course: CPSC 326, Spring 2019
 # Assignment: 2
@@ -6,6 +5,7 @@
 #   Token class, to be used in hw2.py
 #------------------------------------------
 
+# tokentype constants
 ASSIGN  = "ASSIGN"
 COMMA   = "COMMA"
 COLON   = "COLON"
@@ -53,11 +53,14 @@ STRINGVAL   = "STRINGVAL"
 ID          = "ID"
 
 class Token(object):
+    # init method
     def __init__(self, tokentype, lexeme, line, column):
         self.tokentype = tokentype
         self.lexeme = lexeme
         self.line = line
         self.column = column
     
+    # str method
     def __str__(self):
-        return self.tokentype + " '" + str(self.lexeme) + "' " + str(self.line) + ":" + str(self.column)
+        return self.tokentype + " '" + str(self.lexeme) + "' " + (
+            str(self.line)) + ":" + str(self.column)

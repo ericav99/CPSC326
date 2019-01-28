@@ -1,4 +1,3 @@
-#
 # Author: Maxwell Sherman
 # Course: CPSC 326, Spring 2019
 # Assignment: 2
@@ -7,11 +6,13 @@
 #------------------------------------------
 
 class MyPLError(Exception):
+    # init method
     def __init__(self, message, line, column):
         self.message = message
         self.line = line
         self.column = column
     
+    # str method
     def __str__(self):
         msg = self.message
         line = self.line

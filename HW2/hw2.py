@@ -12,6 +12,7 @@ import mypl_lexer as lexer
 import mypl_error as error
 import sys
 
+# main driver function
 def main(filename):
     try:
         file_stream = open(filename, "r")
@@ -23,16 +24,15 @@ def main(filename):
         file_stream.close()
         sys.exit(e)
 
+# main helper function
+# generates tokens until receiving the EOS token
 def hw2(file_stream):
-    try:
-        the_lexer = lexer.Lexer(file_stream)
-        the_token = the_lexer.next_token()
-        while the_token.tokentype != token.EOS:
-            print(the_token)
-            the_token = the_lexer.next_token()
+    the_lexer = lexer.Lexer(file_stream)
+    the_token = the_lexer.next_token()
+    while the_token.tokentype != token.EOS:
         print(the_token)
-    except Exception as e:
-        print(e)
+        the_token = the_lexer.next_token()
+    print(the_token)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
