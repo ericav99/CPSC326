@@ -61,7 +61,7 @@ class Lexer(object):
             # because people might not put whitespace (ex. x=x+5; )
             # if there is a non-digit character,
             # we'll raise an error in the loop
-            while self.__peek() not in ";=+-*/%<>()" and not (
+            while self.__peek() not in ";=+-*/%<>()," and not (
                 self.__peek().isspace()):
                 # if not digit or decimal, error
                 if not self.__peek().isdigit() and self.__peek() != ".":
