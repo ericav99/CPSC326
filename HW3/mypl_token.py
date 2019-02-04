@@ -1,8 +1,8 @@
 # Author: Maxwell Sherman
 # Course: CPSC 326, Spring 2019
-# Assignment: 2
+# Assignment: 3
 # Description:
-#   Token class, to be used in hw2.py
+#   Token class, to be used in hw3.py
 #------------------------------------------
 
 # tokentype constants
