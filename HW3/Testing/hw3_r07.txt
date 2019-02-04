@@ -1,1 +1,1 @@
-./test.sh: line 16: ./hw2.py: No such file or directory
+error: expected ")", found ";" in parser at line 8 column 15
