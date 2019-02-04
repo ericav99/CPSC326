@@ -13,6 +13,7 @@ import mypl_lexer as lexer
 import mypl_parser as parser
 import sys
 
+# main driver function
 def main(filename):
     try:
         file_stream = open(filename, "r")
@@ -26,6 +27,8 @@ def main(filename):
         file_stream.close()
         sys.exit(e)
 
+# main helper function
+# analyzes tokens from lexer to make sure they fit the MyPL grammar
 def hw3(the_parser):
     the_parser.parse()
 

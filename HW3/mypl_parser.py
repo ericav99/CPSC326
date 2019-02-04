@@ -9,25 +9,33 @@ import mypl_error as error
 import mypl_lexer as lexer
 import mypl_token as token
 
+# MyPL Parser (runs through token sequence matching it to the MyPL grammar)
+# reads a stream (lexer.next_token()) of MyPL tokens
+# and stops when there is a syntax problem, raising a MyPLError
 class Parser(object):
+    # init method
     def __init__(self, lexer):
         self.lexer = lexer
         self.current_token = None
     
+    # recursively descends the MyPL grammar with each new token
     def parse(self):
         self.__advance() # None -> first token
         self.__stmts()
         self.__eat(token.EOS, "expected EOS") # this could just be advance(), but it's here to be safe
     
+    # moves to the next token without checking
     def __advance(self):
         self.current_token = self.lexer.next_token()
     
+    # moves to the next token if it matches tokentype, else raises an error
     def __eat(self, tokentype, error_msg):
         if self.current_token.tokentype == tokentype:
             self.__advance()
         else:
             self.__error(error_msg)
     
+    # raises a descriptive MyPLError given a simple error_msg
     def __error(self, error_msg):
         s = error_msg + ', found "' + self.current_token.lexeme + '" in parser'
         l = self.current_token.line
