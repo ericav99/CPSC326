@@ -58,7 +58,7 @@ class Lexer(object):
             
             # read until it's another important character in MyPL or whitespace because people might not put whitespace (ex. x=x+5; )
             # if there is a non-digit character, we'll raise an error in the loop
-            while self.__peek() not in ";=+-*/%<>()," and not self.__peek().isspace():
+            while self.__peek() not in ';=+-*/%<>(),"' and not self.__peek().isspace():
                 # if not digit or decimal, error
                 if not self.__peek().isdigit() and self.__peek() != ".":
                     raise error.MyPLError('unexpected symbol "' + self.__peek() + '"', self.line, self.column)
