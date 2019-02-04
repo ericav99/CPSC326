@@ -1,0 +1,2 @@
+# no semicolon before EOS
+print("hi!")

@@ -1,0 +1,11 @@
+# error case, should complain about extra "end"
+fun int f(x: int)
+    if x == 0 then
+        return x;
+    else
+       f(x - 1);
+    end
+end
+end
+
+

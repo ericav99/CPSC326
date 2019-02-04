@@ -1,0 +1,2 @@
+# putting an entire program on one line
+fun int f(x: int) if x == 0 then return x; else f(x - 1); end end

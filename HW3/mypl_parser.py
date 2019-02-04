@@ -17,7 +17,7 @@ class Parser(object):
     def parse(self):
         self.__advance() # None -> first token
         self.__stmts()
-        self.__eat(token.EOS, "expecting EOS") # this could just be advance(), but it's here to be safe
+        self.__eat(token.EOS, "expected EOS") # this could just be advance(), but it's here to be safe
     
     def __advance(self):
         self.current_token = self.lexer.next_token()
@@ -84,14 +84,14 @@ class Parser(object):
             self.__exit()
         else:
             self.__expr()
-            self.__eat(token.SEMICOLON, 'expecting ";"')
+            self.__eat(token.SEMICOLON, 'expected ";"')
     
     def __sdecl(self):
         # print("sdecl: " + str(self.current_token))
         self.__advance() # eat STRUCT (we already know from stmt)
-        self.__eat(token.ID, 'expecting ID')
+        self.__eat(token.ID, 'expected ID')
         self.__vdecls()
-        self.__eat(token.END, 'expecting "end"')
+        self.__eat(token.END, 'expected "end"')
     
     def __vdecls(self):
         # print("vdecls: " + str(self.current_token))
@@ -106,23 +106,23 @@ class Parser(object):
             self.__advance() # eat NIL (we already know from 1 line up)
         else:
             self.__type()
-        self.__eat(token.ID, 'expecting ID')
-        self.__eat(token.LPAREN, 'expecting "("')
+        self.__eat(token.ID, 'expected ID')
+        self.__eat(token.LPAREN, 'expected "("')
         self.__params()
-        self.__eat(token.RPAREN, 'expecting ")"')
+        self.__eat(token.RPAREN, 'expected ")"')
         self.__bstmts()
-        self.__eat(token.END, 'expecting "end"')
+        self.__eat(token.END, 'expected "end"')
     
     def __params(self):
         # print("params: " + str(self.current_token))
         if self.current_token.tokentype == token.ID:
             self.__advance() # eat ID (we already know from 1 line up)
-            self.__eat(token.COLON, 'expecting ":"')
+            self.__eat(token.COLON, 'expected ":"')
             self.__type()
             while self.current_token.tokentype == token.COMMA:
                 self.__advance() # eat COMMA (we already know from 1 line up)
-                self.__eat(token.ID, 'expecting ID')
-                self.__eat(token.COLON, 'expecting ":"')
+                self.__eat(token.ID, 'expected ID')
+                self.__eat(token.COLON, 'expected ":"')
                 self.__type()
     
     def __type(self):
@@ -134,7 +134,7 @@ class Parser(object):
                 self.current_token.tokentype == token.STRINGTYPE):
             self.__advance() # eat (we already know from 1 line up)
         else:
-            self.__error('expecting type')
+            self.__error('expected type')
     
     def __exit(self):
         # print("exit: " + str(self.current_token))
@@ -148,16 +148,16 @@ class Parser(object):
                 self.current_token.tokentype == token.ID or
                 self.current_token.tokentype == token.LPAREN): # check for expr -> LPAREN
             self.__expr()
-        self.__eat(token.SEMICOLON, 'expecting ";"')
+        self.__eat(token.SEMICOLON, 'expected ";"')
     
     def __vdecl(self):
         # print("vdecl: " + str(self.current_token))
         self.__advance() # eat VAR (we already know from bstmt and vdecls)
-        self.__eat(token.ID, 'expecting ID')
+        self.__eat(token.ID, 'expected ID')
         self.__tdecl()
-        self.__eat(token.ASSIGN, 'expecting "="')
+        self.__eat(token.ASSIGN, 'expected "="')
         self.__expr()
-        self.__eat(token.SEMICOLON, 'expecting ";"')
+        self.__eat(token.SEMICOLON, 'expected ";"')
     
     def __tdecl(self):
         # print("tdecl: " + str(self.current_token))
@@ -169,32 +169,32 @@ class Parser(object):
         # print("assign: " + str(self.current_token))
         self.__advance() # eat SET (we already know from bstmt)
         self.__lvalue()
-        self.__eat(token.ASSIGN, 'expecting "="')
+        self.__eat(token.ASSIGN, 'expected "="')
         self.__expr()
-        self.__eat(token.SEMICOLON, 'expecting ";"')
+        self.__eat(token.SEMICOLON, 'expected ";"')
     
     def __lvalue(self):
         # print("lvalue: " + str(self.current_token))
-        self.__eat(token.ID, 'expecting ID')
+        self.__eat(token.ID, 'expected ID')
         while self.current_token.tokentype == token.DOT:
             self.__advance() # eat DOT (we already know from 1 line up)
-            self.__eat(token.ID, 'expecting ID')
+            self.__eat(token.ID, 'expected ID')
     
     def __cond(self):
         # print("cond: " + str(self.current_token))
         self.__advance() # eat IF (we already know from bstmt)
         self.__bexpr()
-        self.__eat(token.THEN, 'expecting "then"')
+        self.__eat(token.THEN, 'expected "then"')
         self.__bstmts()
         self.__condt()
-        self.__eat(token.END, 'expecting "end"')
+        self.__eat(token.END, 'expected "end"')
     
     def __condt(self):
         # print("condt: " + str(self.current_token))
         if self.current_token.tokentype == token.ELIF:
             self.__advance() # eat ELIF (we already know this from 1 line up)
             self.__bexpr()
-            self.__eat(token.THEN, 'expecting "then"')
+            self.__eat(token.THEN, 'expected "then"')
             self.__bstmts()
             self.__condt()
         elif self.current_token.tokentype == token.ELSE:
@@ -205,16 +205,16 @@ class Parser(object):
         # print("while: " + str(self.current_token))
         self.__advance() # eat WHILE (we already know from bstmt)
         self.__bexpr()
-        self.__eat(token.DO, 'expecting "do"')
+        self.__eat(token.DO, 'expected "do"')
         self.__bstmts()
-        self.__eat(token.END, 'expecting "end"')
+        self.__eat(token.END, 'expected "end"')
     
     def __expr(self):
         # print("expr: " + str(self.current_token))
         if self.current_token.tokentype == token.LPAREN:
             self.__advance() # eat LPAREN (we already know from 1 line up)
             self.__expr()
-            self.__eat(token.RPAREN, 'expecting ")"')
+            self.__eat(token.RPAREN, 'expected ")"')
         else:
             self.__rvalue()
         
@@ -240,21 +240,21 @@ class Parser(object):
             self.__advance() # eat (we already know from 1 line up)
         elif self.current_token.tokentype == token.NEW:
             self.__advance()
-            self.__eat(token.ID, 'expecting ID')
+            self.__eat(token.ID, 'expected ID')
         else:
             self.__idrval()
     
     def __idrval(self):
         # print("idrval: " + str(self.current_token))
-        self.__eat(token.ID, 'expecting ID')
+        self.__eat(token.ID, 'expected ID')
         if self.current_token.tokentype == token.LPAREN:
             self.__advance() # eat LPAREN (we already know from 1 line up)
             self.__exprlist()
-            self.__eat(token.RPAREN, 'expecting ")"')
+            self.__eat(token.RPAREN, 'expected ")"')
         else:
             while self.current_token.tokentype == token.DOT:
                 self.__advance() # eat DOT (we already know from 1 line up)
-                self.__eat(token.ID, 'expecting ID')
+                self.__eat(token.ID, 'expected ID')
     
     def __exprlist(self):
         # print("exprlist: " + str(self.current_token))
@@ -280,7 +280,7 @@ class Parser(object):
         elif self.current_token.tokentype == token.LPAREN:
             self.__advance() # eat LPAREN (we already know from 1 line up)
             self.__bexpr()
-            self.__eat(token.RPAREN, 'expecting ")"')
+            self.__eat(token.RPAREN, 'expected ")"')
             self.__bconnct()
         else:
             self.__expr()
