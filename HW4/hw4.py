@@ -15,6 +15,7 @@ import mypl_ast as ast
 import mypl_print_visitor as ast_printer
 import sys
 
+# main driver function
 def main(filename):
     try:
         file_stream = open(filename, 'r')
@@ -26,6 +27,8 @@ def main(filename):
         file_stream.close()
         sys.exit(e)
 
+# main helper function
+# constructs an AST and pretty prints it back into code
 def hw4(file_stream):
     the_lexer = lexer.Lexer(file_stream)
     the_parser = parser.Parser(the_lexer)

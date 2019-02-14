@@ -1,3 +1,4 @@
+
 struct SimpleStruct
     var v1: int = 0;
     var v2: float = 0.0;
@@ -8,7 +9,3 @@ end
 var x = new SimpleStruct;
 set x.v1 = 1;
 set x.v3 = "hello";
-
-fun string add(x: int, y: float, z: string)
-    return;
-end

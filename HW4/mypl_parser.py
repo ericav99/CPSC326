@@ -45,8 +45,11 @@ class Parser(object):
         c = self.current_token.column
         raise error.MyPLError(s, l, c)
     
-    # beginning of recursive descent functions
+    # beginning of recursive descent methods
     # each one will expect to be on the next token and not need to advance
+    
+    # methods hardly receive arguments
+    # this is usually just for recursion
     
     # returns a StmtList node
     def __stmts(self, stmt_list_node):
@@ -196,13 +199,6 @@ class Parser(object):
                 self.current_token.tokentype == token.ID or
                 self.current_token.tokentype == token.LPAREN): # check for expr -> LPAREN
             return_stmt_node.return_expr = self.__expr()
-        '''
-        else:
-            nil_expr = ast.SimpleExpr()
-            nil_expr.term = ast.SimpleRValue()
-            nil_expr.term.val = token.Token(token.NIL, "nil", -1, -1)
-            return_stmt_node.return_expr = nil_expr # if the code contains "return;" without an expression, put nil
-        '''
         self.__eat(token.SEMICOLON, 'expected ";"')
         return return_stmt_node
     

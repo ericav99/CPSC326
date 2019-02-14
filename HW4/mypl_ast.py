@@ -8,37 +8,36 @@
 
 import mypl_token as token
 
+# base class for AST
 class ASTNode(object):
-    """The base class for the abstract syntax tree."""
     def accept(self, visitor): pass
 
+# base class for all statement nodes
 class Stmt(ASTNode):
-    """The base class for all statement nodes."""
     def accept(self, visitor): pass
 
+# consists of a list of statements
 class StmtList(ASTNode):
-    """A statement list consists of a list of statements."""
     def __init__(self):
-        self.stmts = [] # list of Stmt
+        self.stmts = [] # list of Stmt nodes
     
     def accept(self, visitor):
         visitor.visit_stmt_list(self)
 
+# base class for all expression nodes
 class Expr(ASTNode):
-    """THe base class for all expression nodes."""
     def accept(self, visitor): pass
 
+# simple statement that's just an expression
 class ExprStmt(Stmt):
-    """A simple statement that is just an expression."""
     def __init__(self):
         self.expr = None    # Expr node
     
     def accept(self, visitor):
         visitor.visit_expr_stmt(self)
 
+# consists of a variable identifier, (optional) type, and initial value
 class VarDeclStmt(Stmt):
-    """A variable declaration statement consists of a variable identifier,
-    an (optional) type, and an initial value. """
     def __init__(self):
         self.var_id = None      # Token (ID)
         self.var_type = None    # Token (STRINGTYPE, ..., ID)
@@ -47,8 +46,8 @@ class VarDeclStmt(Stmt):
     def accept(self, visitor):
         visitor.visit_var_decl_stmt(self)
 
+# Consists of an identifier and an expression
 class AssignStmt(Stmt):
-    """An assignment statement consists of an identifier and an expression."""
     def __init__(self):
         self.lhs = None # LValue node
         self.rhs = None # Expr node
@@ -56,9 +55,8 @@ class AssignStmt(Stmt):
     def accept(self, visitor):
         visitor.visit_assign_stmt(self)
 
+# consists of an identifier and a list of variable declarations
 class StructDeclStmt(Stmt):
-    """A struct declaraction statement consists of an identifier,
-    and a list of variable declarations."""
     def __init__(self):
         self.struct_id = None   # Token (ID)
         self.var_decls = []     # [VarDeclStmt]
@@ -66,10 +64,9 @@ class StructDeclStmt(Stmt):
     def accept(self, visitor):
         visitor.visit_struct_decl_stmt(self)
 
+# consists of an identifier, list of parameters (identifiers w/ types, 
+# return type, and list of function body statements
 class FunDeclStmt(Stmt):
-    """A function declaration statement consists of an identifier,
-    a list of parameters (identifiers with types), a return type,
-    and a list of function body statements."""
     def __init__(self):
         self.fun_name = None        # Token (ID)
         self.params = []            # [FunParam]
@@ -79,9 +76,9 @@ class FunDeclStmt(Stmt):
     def accept(self, visitor):
         visitor.visit_fun_decl_stmt(self)
 
+# consists of a return expression and the corresponding return token
+# (for printing line and col numbers)
 class ReturnStmt(Stmt):
-    """A return statement consists of a return expression
-    and the corresponding return token (for printing line and col numbers)."""
     def __init__(self):
         self.return_expr = None     # Expr node
         self.return_token = None    # to keep track of location (ex. return;)
@@ -89,9 +86,8 @@ class ReturnStmt(Stmt):
     def accept(self, visitor):
         visitor.visit_return_stmt(self)
 
+# consists of a condition (Boolean expression) and statement list (body)
 class WhileStmt(Stmt):
-    """A while statement consists of a condition (Boolean expression)
-    and a statement list (the body of the while)."""
     def __init__(self):
         self.bool_expr = None       # BoolExpr node
         self.stmt_list = StmtList() # StmtList node
@@ -99,9 +95,9 @@ class WhileStmt(Stmt):
     def accept(self, visitor):
         visitor.visit_while_stmt(self)
 
+# consists of a basic 'if' part, (possibly empty) list of elifs, and
+# optional else part (represented as a statement list)
 class IfStmt(Stmt):
-    """An if statement consists of a basic 'if' part, a (possibly empty)
-    list of elifs, and an optional else part (represented as a statement list)."""
     def __init__(self):
         self.if_part = BasicIf()        # BasicIf node
         self.elseifs = []               # [BasicIf]
@@ -111,17 +107,17 @@ class IfStmt(Stmt):
     def accept(self, visitor):
         visitor.visit_if_stmt(self)
 
+# consists of an rvalue
 class SimpleExpr(Expr):
-    """A simple expression consists of an rvalue"""
     def __init__(self):
         self.term = None    # RValue node
     
     def accept(self, visitor):
         visitor.visit_simple_expr(self)
 
+# consists of an expression, math operator
+# and another (possibly complex) expression
 class ComplexExpr(Expr):
-    """A complex expression consists of an expression, followed by
-    a mathematical operator, followed by another (possibly complex) expression"""
     def __init__(self):
         self.first_operand = None   # Expr node
         self.math_rel = None        # Token (PLUS, MINUS, etc.)
@@ -130,11 +126,10 @@ class ComplexExpr(Expr):
     def accept(self, visitor):
         visitor.visit_complex_expr(self)
 
+# consists of an expression, optional Boolean relation and another expression,
+# optional 'and'/'or' and additional Boolean expression (recursive)
+# this entire thing can be negated, too
 class BoolExpr(ASTNode):
-    """A Boolean expression consists of an expression, a Boolean relation,
-    another expression, and possibly an 'and' or 'or' followed by additional
-    Boolean expressions. An entire Boolean expression can also be negated.
-    Only the first_expr is required."""
     def __init__(self):
         self.first_expr = None      # Expr node
         self.bool_rel = None        # Token (GREATER_THAN, LESS_THAN, etc.)
@@ -146,17 +141,16 @@ class BoolExpr(ASTNode):
     def accept(self, visitor):
         visitor.visit_bool_expr(self)
 
+# consists of a simple ID or path expression
 class LValue(ASTNode):
-    """An lvalue consists of a simple ID or a path expression."""
     def __init__(self):
         self.path = []              # [Token (ID)] (just one implies a simple var)
     
     def accept(self, visitor):
         visitor.visit_lvalue(self)
 
+# consists of a variable ID and type
 class FunParam(Stmt):
-    """A function declaration parameter consists of a variable name (ID)
-    and a type."""
     def __init__(self):
         self.param_name = None  # Token (ID)
         self.param_type = None  # Token (STRINGTYPE, INTTYPE, etc.)
@@ -164,36 +158,34 @@ class FunParam(Stmt):
     def accept(self, visitor):
         visitor.visit_fun_param(self)
 
+# consists of a condition (Boolean expression) and list of statements (body)
 class BasicIf(object):
-    """A basic if holds a condition (Boolean expression)
-    and a list of statements (the body of the if)."""
     def __init__(self):
         self.bool_expr = None       # BoolExpr node
         self.stmt_list = StmtList() # StmtList() node
 
+# base class for rvalue nodes
 class RValue(ASTNode):
-    """The base class for rvalue nodes."""
     def accept(self, visitor): pass
 
+# consists of a single primitive value
 class SimpleRValue(RValue):
-    """A simple rvalue consists of a single primitive value."""
     def __init__(self):
         self.val = None # Token (STRINGVAL, INTVAL, etc.)
     
     def accept(self, visitor):
         visitor.visit_simple_rvalue(self)
 
+# consists of a struct name (ID)
 class NewRValue(RValue):
-    """A new rvalue consists of a struct name (ID)"""
     def __init__(self):
         self.struct_type = None # Token (ID)
     
     def accept(self, visitor):
         visitor.visit_new_rvalue(self)
 
+# consists of a function name (ID) and list of args (expressions)
 class CallRValue(RValue):
-    """A function call rvalue consists of a function name (ID)
-    and a list of arguments (expressions)"""
     def __init__(self):
         self.fun = None # Token (ID)
         self.args = []  # [Expr]
@@ -201,16 +193,17 @@ class CallRValue(RValue):
     def accept(self, visitor):
         visitor.visit_call_rvalue(self)
 
+# consists of a path of 1+ identifiers
 class IDRValue(RValue):
-    """An identifier rvalue consists of a path of one or more identifiers."""
     def __init__(self):
         self.path = []  # [Token (ID)]
     
     def accept(self, visitor):
         visitor.visit_id_rvalue(self)
 
+# base class for AST visitors
+# everything here is defined in mypl_print_visitor.py
 class Visitor(object):
-    """THe base class for AST visitors."""
     def visit_stmt_list(self, stmt_list): pass
     def visit_expr_stmt(self, expr_stmt): pass
     def visit_var_decl_stmt(self, var_decl): pass
