@@ -1,19 +1,14 @@
-var x: int = 0;
-var str_1 = "a";
-var flag: bool = false;
-var pi5 = 3.14159;
+struct SimpleStruct
+    var v1: int = 0;
+    var v2: float = 0.0;
+    var v3: string = "";
+    var v4 = nil;
+end
 
-set x = (80/2)+2;
-set str_1 = "Hello World";
-set str_1 = str_1 + "!";
+var x = new SimpleStruct;
+set x.v1 = 1;
+set x.v3 = "hello";
 
-if x > 0 then
-    print("x is large");
-    set x = x - 1;
-elif x == 0 then
-    print("x is zero");
-    set x = 1;
-else
-    print("x is small");
-    set x = x + 1;
+fun string add(x: int, y: float, z: string)
+    return;
 end

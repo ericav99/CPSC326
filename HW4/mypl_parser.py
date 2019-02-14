@@ -73,8 +73,7 @@ class Parser(object):
                 self.current_token.tokentype == token.ID or
                 self.current_token.tokentype == token.LPAREN): # check for expr -> LPAREN
             stmt_list_node.stmts.append(self.__bstmt()) # get the current Stmt node
-            stmt_list_node_recursed = self.__bstmts(stmt_list_node) # get all the next Stmt node
-            stmt_list_node.stmts = stmt_list_node.stmts + stmt_list_node_recursed.stmts # concatenate
+            stmt_list_node = self.__bstmts(stmt_list_node) # get all the next Stmt node
         return stmt_list_node
     
     # returns any kind of Stmt node
@@ -101,7 +100,8 @@ class Parser(object):
         elif self.current_token.tokentype == token.RETURN:
             return self.__exit() # return ReturnStmt node
         else:
-            expr_stmt_node = self.__expr()
+            expr_stmt_node = ast.ExprStmt()
+            expr_stmt_node.expr = self.__expr()
             self.__eat(token.SEMICOLON, 'expected ";"')
             return expr_stmt_node # return ExprStmt node
     
@@ -113,7 +113,7 @@ class Parser(object):
         struct_decl_stmt_node.struct_id = self.current_token # StructDeclStmt ID
         self.__eat(token.ID, 'expected ID')
         # passing in an empty list because __vdecls() recurses with a list parameter
-        struct_decl_stmt_node.var_decls(self.__vdecls([])) # StructDeclStmt [VarDeclStmt]
+        struct_decl_stmt_node.var_decls = self.__vdecls([]) # StructDeclStmt [VarDeclStmt]
         self.__eat(token.END, 'expected "end"')
         return struct_decl_stmt_node
     
@@ -158,6 +158,7 @@ class Parser(object):
             fun_param_list.append(fun_param) # add first FunParam node to list (if it exists)
             while self.current_token.tokentype == token.COMMA:
                 self.__advance() # eat COMMA (we already know from 1 line up)
+                fun_param = ast.FunParam() # need to reset fun_param or the objects in the list are connected
                 fun_param.param_name = self.current_token
                 self.__eat(token.ID, 'expected ID')
                 self.__eat(token.COLON, 'expected ":"')
@@ -183,7 +184,8 @@ class Parser(object):
     def __exit(self):
         # print("exit: " + str(self.current_token))
         return_stmt_node = ast.ReturnStmt()
-        return_stmt_node.return_token = self.current_token
+        # the next line just contains the 'return' keyword
+        return_stmt_node.return_token = self.current_token # this is useless but part of the documentation
         self.__advance() # eat RETURN (we already know from bstmt)
         if (self.current_token.tokentype == token.STRINGVAL or # check for expr -> rvalue...
                 self.current_token.tokentype == token.INTVAL or
@@ -194,11 +196,13 @@ class Parser(object):
                 self.current_token.tokentype == token.ID or
                 self.current_token.tokentype == token.LPAREN): # check for expr -> LPAREN
             return_stmt_node.return_expr = self.__expr()
+        '''
         else:
             nil_expr = ast.SimpleExpr()
             nil_expr.term = ast.SimpleRValue()
-            nil_expr.term.val = Token(token.NIL, "nil", -1, -1)
+            nil_expr.term.val = token.Token(token.NIL, "nil", -1, -1)
             return_stmt_node.return_expr = nil_expr # if the code contains "return;" without an expression, put nil
+        '''
         self.__eat(token.SEMICOLON, 'expected ";"')
         return return_stmt_node
     
@@ -242,8 +246,8 @@ class Parser(object):
         lvalue_node.path.append(self.current_token) # add first lvalue
         self.__eat(token.ID, 'expected ID')
         while self.current_token.tokentype == token.DOT:
+            self.__advance() # eat DOT (we already know from 1 line up)
             lvalue_node.path.append(self.current_token) # add following lvalues if they exist
-            self.__advance() # eat DOT (we already know from 2 lines up)
             self.__eat(token.ID, 'expected ID')
         return lvalue_node
     
@@ -285,7 +289,7 @@ class Parser(object):
         while_stmt_node = ast.WhileStmt()
         while_stmt_node.bool_expr = self.__bexpr() # WhileStmt boolean expression
         self.__eat(token.DO, 'expected "do"')
-        while_stmt_node.stmt_list = self.__bstmts() # WhileStmt statement list
+        while_stmt_node.stmt_list = self.__bstmts(ast.StmtList()) # WhileStmt statement list
         self.__eat(token.END, 'expected "end"')
         return while_stmt_node
     
@@ -335,7 +339,7 @@ class Parser(object):
             self.__advance() # eat (we already know from 3-7 lines up)
             return simple_rvalue_node # return SimpleRValue node
         elif self.current_token.tokentype == token.NEW:
-            self.__advance()
+            self.__advance() # eat NEW (we already know from 1 line up)
             new_rvalue_node = ast.NewRValue()
             new_rvalue_node.struct_type = self.current_token
             self.__eat(token.ID, 'expected ID')
@@ -390,13 +394,13 @@ class Parser(object):
             bool_expr_node.negated = True
             self.__advance() # eat NOT (we already know from 2 lines up)
             bool_expr_node.first_expr = self.__bexpr()
-            bool_expr_node = self.__bexprt()
+            bool_expr_node = self.__bexprt(bool_expr_node)
         elif self.current_token.tokentype == token.LPAREN:
             self.__advance() # eat LPAREN (we already know from 1 line up)
             bool_expr_node.first_expr = self.__bexpr()
             self.__eat(token.RPAREN, 'expected ")"')
             # fine to not fill bool_rel and second_expr, they're optional
-            bool_expr_node = self.__bconnct()
+            bool_expr_node = self.__bconnct(bool_expr_node)
         else:
             bool_expr_node.first_expr = self.__expr()
             bool_expr_node = self.__bexprt(bool_expr_node)

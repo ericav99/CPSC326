@@ -170,8 +170,6 @@ class BasicIf(object):
     def __init__(self):
         self.bool_expr = None       # BoolExpr node
         self.stmt_list = StmtList() # StmtList() node
-    
-    # TODO: should there be an accept() method here?
 
 class RValue(ASTNode):
     """The base class for rvalue nodes."""
