@@ -1,9 +1,9 @@
 # Author: Maxwell Sherman
 # Course: CPSC 326, Spring 2019
-# Assignment: 4
+# Assignment: 5
 # Description:
-#   Lexer class, to be used in hw4.py
-#------------------------------------------
+#   Lexer class, to be used in hw5.py
+#--------------------------------------
 
 import mypl_token as token
 import mypl_error as error

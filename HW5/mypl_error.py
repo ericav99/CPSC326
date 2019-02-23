@@ -1,8 +1,8 @@
 # Author: Maxwell Sherman
 # Course: CPSC 326, Spring 2019
-# Assignment: 4
+# Assignment: 5
 # Description:
-#   MyPLError class, to be used in hw4.py
+#   MyPLError class, to be used in hw5.py
 #------------------------------------------
 
 class MyPLError(Exception):

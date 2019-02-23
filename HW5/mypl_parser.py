@@ -1,10 +1,10 @@
 # Author: Maxwell Sherman
 # Course: CPSC 326, Spring 2019
-# Assignment: 4
+# Assignment: 5
 # Description:
 #   Parser class, creates an AST
 #   and performs some semantic analysis
-#------------------------------------------
+#----------------------------------------
 
 import mypl_error as error
 import mypl_lexer as lexer
