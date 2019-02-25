@@ -10,10 +10,10 @@
 # to its associated information
 class SymbolTable(object):
     # init method
-    def __init(self):
+    def __init__(self):
         self.scopes = [] # list of {id_name: info}
     
-    # TODO: documentation
+    # returns first the environment where an identifier (name) is found
     def __environment(self, name):
         # search from last (most recent) to first environment
         for i in range(len(self.scopes)-1, -1, -1):

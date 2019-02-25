@@ -33,7 +33,7 @@ def hw5(file_stream):
     the_lexer = lexer.Lexer(file_stream)
     the_parser = parser.Parser(the_lexer)
     stmt_list = the_parser.parse()
-    tye_type_checker = type_checker.TypeChecker()
+    the_type_checker = type_checker.TypeChecker()
     stmt_list.accept(the_type_checker)
 
 if __name__ == '__main__':
