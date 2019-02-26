@@ -24,7 +24,7 @@ class SymbolTable(object):
     def id_exists(self, identifier):
         return self.__environment(identifier) != None
     
-    # TODO: documentation
+    # adds a variable ID to the most recent environment with no info
     def add_id(self, identifier):
         if not self.scopes: # can't add if no environment
             return

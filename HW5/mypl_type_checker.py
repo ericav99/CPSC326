@@ -10,12 +10,6 @@ import mypl_ast as ast
 import mypl_error as error
 import mypl_symbol_table as symbol_table
 
-# TODO: var decls and assigns
-# TODO: if stmts and while loops
-# TODO: struct decls and creations
-# TODO: function decls and calls
-# TODO: nil values and types
-
 # a MyPL type checker visitor implementation where struct types
 # take the form: type_id -> {v1:t1, ..., vn:tn} and function types
 # take the form: fun_id -> [[t1, t2, ..., tn], return_type]
@@ -209,3 +203,51 @@ class TypeChecker(ast.Visitor):
                         self.__error(msg, bool_expr.first_expr.term.path[0])
                 else: # ast.ComplexExpr
                     self.__error(msg, bool_expr.first_expr.math_rel)
+    
+    def visit_var_decl_stmt(self, var_decl_stmt):
+        given_type = None
+        if var_decl_stmt.var_type != None:
+            given_type = var_decl_stmt.var_type.tokentype
+        var_decl_stmt.var_expr.accept(self)
+        expr_type = self.current_type
+        
+        if given_type != None and expr_type == token.NIL:
+            # explicitly given type overrides nil expression
+            if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
+                self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
+            self.sym_table.set_info(var_decl_stmt.var_id.lexeme, given_type)
+        elif given_type != None and expr_type != token.NIL:
+            # explicitly given type and expression type
+            # make sure they match
+            if given_type == expr_type:
+                if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
+                    self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
+                self.sym_table.set_info(var_decl_stmt.var_id.lexeme, given_type)
+            else:
+                msg = 'type mismatch in var declaration'
+                self.__error(msg, var_decl_stmt.var_type)
+        else: # given_type == None
+            # no explicit type
+            if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
+                self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
+            self.sym_table.set_info(var_decl_stmt.var_id.lexeme, expr_type)
+    
+    def visit_assign_stmt(self, assign_stmt):
+        # TODO: path[0] doesn't handle structs
+        if self.sym_table.id_exists(assign_stmt.lhs.path[0].lexeme):
+            left_type = self.sym_table.get_info(assign_stmt.lhs.path[0].lexeme)
+            assign_stmt.rhs.accept(self)
+            right_type = self.current_type
+            if left_type == right_type or right_type == token.NIL:
+                self.sym_table.set_info(assign_stmt.lhs.path[0].lexeme, left_type)
+            else:
+                msg = 'type mismatch in assign statement'
+                self.__error(msg, assign_stmt.lhs.path[0])
+        else:
+            msg = 'variable use before declaration'
+            self.__error(msg, assign_stmt.lhs.path[0])
+    
+    # TODO: if stmts and while loops
+    # TODO: struct decls and creations
+    # TODO: function decls and calls
+    # TODO: nil values and types

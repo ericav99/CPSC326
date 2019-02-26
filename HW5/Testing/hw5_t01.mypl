@@ -43,10 +43,10 @@ set x = "bar";
 var x: float = 3.14;
 set x = 2.0;
 # var x: string = 5;
-# var x = nil;
+var x = nil;
 var x: float = nil;
 # set x = "foo";
-# set x = 3;
+# set x = 3; # no casting float -> int
 set x = 3.14;
 
 
