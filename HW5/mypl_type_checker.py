@@ -10,9 +10,10 @@ import mypl_ast as ast
 import mypl_error as error
 import mypl_symbol_table as symbol_table
 
-# a MyPL type checker visitor implementation where struct types
-# take the form: type_id -> {v1:t1, ..., vn:tn} and function types
-# take the form: fun_id -> [[t1, t2, ..., tn], return_type]
+# a MyPL type checker visitor implementation
+# regular IDs take the form: type_id -> 'type'
+# struct types take the form: type_id -> {v1:t1, ..., vn:tn}
+# function types take the form: fun_id -> [[t1, t2, ..., tn], return_type]
 class TypeChecker(ast.Visitor):
     # init method
     def __init__(self):
@@ -32,11 +33,6 @@ class TypeChecker(ast.Visitor):
         # load in built-in function types
         self.sym_table.add_id('print')
         self.sym_table.set_info('print', [[token.STRINGTYPE], token.NIL])
-        
-        '''
-        print(str(self.sym_table.scopes))
-        print(self.sym_table.get_info('return'))
-        '''
         
         # TODO: remaining function types
     
@@ -92,21 +88,33 @@ class TypeChecker(ast.Visitor):
             msg = 'this should not happen'
             self.__error(msg, simple_rvalue.val)
     
-    def visit_new_rvalue(self, new_rvalue): pass
-        # TODO - get the ID token?
-        # self.current_type = new_rvalue.struct_type
+    def visit_new_rvalue(self, new_rvalue):
+        self.current_type = new_rvalue.struct_type.lexeme
     
     def visit_call_rvalue(self, call_rvalue): pass
         # TODO - get the function's return type
     
     def visit_id_rvalue(self, id_rvalue):
-        # TODO: paths.of.struct.vars
         if self.sym_table.id_exists(id_rvalue.path[0].lexeme):
-            self.current_type = self.sym_table.get_info(id_rvalue.path[0].lexeme)
-            # print(str(self.sym_table.get_info(id_rvalue.path[0])))
+            depth = len(id_rvalue.path)
+            if depth > 1:
+                self.visit_id_rvalue.helper(id_rvalue.path[1:], self.sym_table.get_info(id_rvalue.path[0]))
+            else:
+                self.current_type = self.sym_table.get_info(id_rvalue.path[0].lexeme)
         else:
             msg = 'id use before declaration'
             self.__error(msg, id_rvalue.path[0])
+    
+    def visit_id_rvalue_helper(self, path, current_dict):
+        if path[0] in current_dict:
+            depth = len(id_rvalue.path)
+            if depth > 1:
+                self.visit_id_rvalue.helper(path[1:], current_dict[path[0]])
+            else:
+                self.current_type = self.sym_table.get_info(path[0].lexeme)
+        else:
+            msg = 'id use before declaration'
+            self.__error(msg, path[0].lexeme)
     
     def visit_complex_expr(self, complex_expr):
         complex_expr.first_operand.accept(self)
@@ -207,7 +215,10 @@ class TypeChecker(ast.Visitor):
     def visit_var_decl_stmt(self, var_decl_stmt):
         given_type = None
         if var_decl_stmt.var_type != None:
-            given_type = var_decl_stmt.var_type.tokentype
+            if var_decl_stmt.var_type.tokentype == token.ID:
+                given_type = var_decl_stmt.var_type.lexeme
+            else:
+                given_type = var_decl_stmt.var_type.tokentype
         var_decl_stmt.var_expr.accept(self)
         expr_type = self.current_type
         
@@ -239,19 +250,46 @@ class TypeChecker(ast.Visitor):
                 self.sym_table.set_info(var_decl_stmt.var_id.lexeme, expr_type)
     
     def visit_assign_stmt(self, assign_stmt):
-        # TODO: path[0] doesn't handle structs
-        if self.sym_table.id_exists(assign_stmt.lhs.path[0].lexeme):
-            left_type = self.sym_table.get_info(assign_stmt.lhs.path[0].lexeme)
-            assign_stmt.rhs.accept(self)
-            right_type = self.current_type
-            if left_type == right_type or right_type == token.NIL:
-                self.sym_table.set_info(assign_stmt.lhs.path[0].lexeme, left_type)
+        depth = len(assign_stmt.lhs.path)
+        current_dict = {}
+        for i in range(depth):
+            if i == 0:
+                if i == depth - 1:
+                    if self.sym_table.id_exists(assign_stmt.lhs.path[i].lexeme):
+                        left_type = self.sym_table.get_info(assign_stmt.lhs.path[i].lexeme)
+                        assign_stmt.rhs.accept(self)
+                        right_type = self.current_type
+                        if left_type == right_type or right_type == token.NIL:
+                            self.sym_table.set_info(assign_stmt.lhs.path[i].lexeme, left_type)
+                        else:
+                            msg = 'type mismatch in assign statement'
+                            self.__error(msg, assign_stmt.lhs.path[i])
+                else:
+                    if self.sym_table.id_exists(assign_stmt.lhs.path[i].lexeme):
+                        current_dict = self.sym_table.get_info(assign_stmt.lhs.path[i].lexeme)
+                    else:
+                        msg = "variable doesn't exist"
+                        self.__error(msg, assign_stmt.lhs.path[i])
             else:
-                msg = 'type mismatch in assign statement'
-                self.__error(msg, assign_stmt.lhs.path[0])
-        else:
-            msg = 'variable use before declaration'
-            self.__error(msg, assign_stmt.lhs.path[0])
+                if i == depth - 1:
+                    if assign_stmt.lhs.path[i].lexeme in current_dict:
+                        left_type = self.sym_table.get_info(assign_stmt.lhs.path[i].lexeme)
+                        assign_stmt.rhs.accept(self)
+                        right_type = self.current_type
+                        if left_type == right_type or right_type == token.NIL:
+                            self.sym_table.set_info(assign_stmt.lhs.path[i].lexeme, left_type)
+                        else:
+                            msg = 'type mismatch in assign statement'
+                            self.__error(msg, assign_stmt.lhs.path[i])
+                    else:
+                        msg = 'variable use before declaration'
+                        self.__error(msg, assign_stmt.lhs.path[i])
+                else:
+                    if assign_stmt.lhs.path[i].lexeme in current_dict:
+                        current_dict = assign_stmt.lhs.path[i]
+                    else:
+                        msg = "variable doesn't exist"
+                        self.__error(msg, assign_stmt.lhs.path[i])
     
     def visit_if_stmt(self, if_stmt):
         self.visit_basic_if(if_stmt.if_part)
@@ -260,6 +298,7 @@ class TypeChecker(ast.Visitor):
         if if_stmt.has_else:
             if_stmt.else_stmts.accept(self)
     
+    # this is a helper, not an actual visitor method
     def visit_basic_if(self, basic_if):
         basic_if.bool_expr.accept(self)
         self.sym_table.push_environment()
@@ -272,9 +311,14 @@ class TypeChecker(ast.Visitor):
         while_stmt.stmt_list.accept(self)
         self.sym_table.pop_environment()
     
-    # TODO: struct decls and creations
-    
-    def visit_struct_decl_stmt(self, struct_decl_stmt): pass
+    def visit_struct_decl_stmt(self, struct_decl_stmt):
+        new_type = struct_decl_stmt.struct_id.lexeme
+        self.sym_table.push_environment()
+        struct_vars = {}
+        for var_decl in struct_decl_stmt.var_decls:
+            var_decl.accept(self)
+            struct_vars[var_decl.var_id] = self.current_type
+        self.sym_table.set_info(new_type, struct_vars)
     
     # TODO: function decls and calls
     
