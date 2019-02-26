@@ -101,7 +101,7 @@ class TypeChecker(ast.Visitor):
     
     def visit_id_rvalue(self, id_rvalue):
         # TODO: paths.of.struct.vars
-        if self.sym_table.id_exists(id_rvalue.path[0]):
+        if self.sym_table.id_exists(id_rvalue.path[0].lexeme):
             self.current_type = self.sym_table.get_info(id_rvalue.path[0].lexeme)
             # print(str(self.sym_table.get_info(id_rvalue.path[0])))
         else:
@@ -152,15 +152,15 @@ class TypeChecker(ast.Visitor):
                     bool_expr.bool_rel.tokentype == token.LESS_THAN or
                     bool_expr.bool_rel.tokentype == token.GREATER_THAN_EQUAL or
                     bool_expr.bool_rel.tokentype == token.LESS_THAN_EQUAL):
-                if ((left_type == token.INTTYPE or
-                        left_type == token.FLOATTYPE or
-                        left_type == token.BOOLTYPE or
-                        left_type == token.STRINGTYPE) and
-                        (right_type == token.INTTYPE or
-                        right_type == token.FLOATTYPE or
-                        right_type == token.BOOLTYPE or
-                        right_type == STRINGTYPE)):
-                    if left_type == right_type:
+                if ((first_type == token.INTTYPE or
+                        first_type == token.FLOATTYPE or
+                        first_type == token.BOOLTYPE or
+                        first_type == token.STRINGTYPE) and
+                        (second_type == token.INTTYPE or
+                        second_type == token.FLOATTYPE or
+                        second_type == token.BOOLTYPE or
+                        second_type == STRINGTYPE)):
+                    if first_type == second_type:
                         self.current_type = token.BOOLTYPE
                     else:
                         msg = 'mismatched type in boolean expression'
@@ -211,13 +211,14 @@ class TypeChecker(ast.Visitor):
         var_decl_stmt.var_expr.accept(self)
         expr_type = self.current_type
         
+        # if explicitly given type and nil expression
         if given_type != None and expr_type == token.NIL:
             # explicitly given type overrides nil expression
             if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
                 self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
             self.sym_table.set_info(var_decl_stmt.var_id.lexeme, given_type)
+        # if explicitly given type and non-nil expression
         elif given_type != None and expr_type != token.NIL:
-            # explicitly given type and expression type
             # make sure they match
             if given_type == expr_type:
                 if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
@@ -226,11 +227,16 @@ class TypeChecker(ast.Visitor):
             else:
                 msg = 'type mismatch in var declaration'
                 self.__error(msg, var_decl_stmt.var_type)
+        # if no explicitly given type
         else: # given_type == None
-            # no explicit type
-            if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
-                self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
-            self.sym_table.set_info(var_decl_stmt.var_id.lexeme, expr_type)
+            # make sure expression is non-nil
+            if expr_type == token.NIL:
+                msg = 'nil declaraction without explicit type'
+                self.__error(msg, var_decl_stmt.var_id)
+            else:
+                if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
+                    self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
+                self.sym_table.set_info(var_decl_stmt.var_id.lexeme, expr_type)
     
     def visit_assign_stmt(self, assign_stmt):
         # TODO: path[0] doesn't handle structs
@@ -247,7 +253,31 @@ class TypeChecker(ast.Visitor):
             msg = 'variable use before declaration'
             self.__error(msg, assign_stmt.lhs.path[0])
     
-    # TODO: if stmts and while loops
+    def visit_if_stmt(self, if_stmt):
+        self.visit_basic_if(if_stmt.if_part)
+        for elseif in if_stmt.elseifs:
+            self.visit_basic_if(elseif)
+        if if_stmt.has_else:
+            if_stmt.else_stmts.accept(self)
+    
+    def visit_basic_if(self, basic_if):
+        basic_if.bool_expr.accept(self)
+        self.sym_table.push_environment()
+        basic_if.stmt_list.accept(self)
+        self.sym_table.pop_environment()
+    
+    def visit_while_stmt(self, while_stmt):
+        while_stmt.bool_expr.accept(self)
+        self.sym_table.push_environment()
+        while_stmt.stmt_list.accept(self)
+        self.sym_table.pop_environment()
+    
     # TODO: struct decls and creations
+    
+    def visit_struct_decl_stmt(self, struct_decl_stmt): pass
+    
     # TODO: function decls and calls
-    # TODO: nil values and types
+    
+    def visit_fun_decl_stmt(self, struct_decl_stmt): pass
+    
+    def visit_return_stmt(self, return_stmt): pass
