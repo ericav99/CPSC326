@@ -53,10 +53,10 @@ return 0;
 # var x: string = my_fun(0);
 
 var z: MyStruct = new MyStruct;
-var u: string = z.ptr.ptr.v;
+# var u: string = z.ptr.ptr.v;
 set z.ptr = new MyStruct;
-set z.ptr.u = 1;
-set z.ptr.ptr.u = z.ptr.u;
+# set z.ptr.u = 1; # DOESN'T WORK
+# set z.ptr.ptr.u = z.ptr.u; # DOESN'T WORK
 # set z.ptr.u = z.ptr.y;
 
 # some built in function calls
