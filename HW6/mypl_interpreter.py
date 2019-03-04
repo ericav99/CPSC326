@@ -116,7 +116,7 @@ class Interpreter(ast.Visitor):
                 self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
             else:
                 call_rvalue.args[0].accept(self)
-                if type(self.current_value) is not int:
+                if not type(self.current_value) is int:
                     msg = 'argument not of type int'
                     self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
                 else:
@@ -126,8 +126,8 @@ class Interpreter(ast.Visitor):
                 msg = 'incorrect number of args'
                 self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
             else:
-                call_rvalue.args[0].accept(self
-                if type(self.current_value) is not int:
+                call_rvalue.args[0].accept(self)
+                if not type(self.current_value) is int:
                     msg = 'argument not of type int'
                     self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
                 else:
@@ -138,7 +138,7 @@ class Interpreter(ast.Visitor):
                 self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
             else:
                 call_rvalue.args[0].accept(self)
-                if type(self.current_value) is not float:
+                if not type(self.current_value) is float:
                     msg = 'argument not of type float'
                     self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
                 else:
@@ -170,5 +170,95 @@ class Interpreter(ast.Visitor):
             self.current_value = left_value * right_value
         elif math_rel == '/':
             self.current_value = left_value / right_value
-        else: '%'
+        else: # '%'
             self.current_value = left_value % right_value
+    
+    def visit_bool_expr(self, bool_expr):
+        bool_expr.first_expr.accept(self)
+        first_value = self.current_value
+        
+        # if it has a boolrel (==, !=, >, <, >=, <=)
+        if bool_expr.bool_rel != None and bool_expr.second_expr != None:
+            bool_expr.second_expr.accept(self)
+            second_value = self.current_value
+            if bool_expr.bool_rel.tokentype == token.EQUAL:
+                self.current_value = (first_value == second_value)
+            elif bool_expr.bool_rel.tokentype == token.NOT_EQUAL:
+                self.current_value = (first_value != second_value)
+            elif bool_expr.bool_rel.tokentype == token.GREATER_THAN:
+                self.current_value = (first_value > second_value)
+            elif bool_expr.bool_rel.tokentype == token.LESS_THAN:
+                self.current_value = (first_value < second_value)
+            elif bool_expr.bool_rel.tokentype == token.GREATER_THAN_EQUAL:
+                self.current_value = (first_value >= second_value)
+            else: # LESS_THAN_EQUAL
+                self.current_value = (first_value <= second_value)
+        
+        # if it has a bool_connector
+        if bool_expr.bool_connector != None and bool_expr.rest != None:
+            # first_half stores either first_expr
+            # or the result of a comparison of first_expr and second_expr
+            first_half = self.current_value
+            
+            # second_half stores the result of rest
+            bool_expr.rest.accept(self)
+            second_half = self.current_value
+            
+            if bool_connector.tokentype == token.AND:
+                self.current_value = first_half and second_half
+            else: # OR
+                self.current_value = first_half or second_half
+        
+        # if negated
+        if bool_expr.negated:
+            self.current_value = not self.current_value
+    
+    def visit_var_decl_stmt(self, var_decl_stmt):
+        var_decl_stmt.var_expr.accept(self)
+        self.sym_table[var_decl_stmt.var_id.lexeme] = self.current_type
+    
+    # sub-variables not supported because structs not currently supported
+    def visit_assign_stmt(self, assign_stmt):
+        if len(assign_stmt.lhs.path) > 1:
+            msg = 'structs not currently supported'
+            self.__error(msg, assign_stmt.lhs.path[1].row, assign_stmt.lhs.path[1].column)
+        else:
+            assign_stmt.rhs.accept(self)
+            self.sym_table[assign_stmt.lhs.path[0]] = self.current_value
+    
+    def visit_if_stmt(self, if_stmt):
+        # if it branches, then we stop checking the following elseifs/else
+        has_branched = False
+        
+        # if part
+        if_stmt.if_part.bool_expr.accept(self)
+        if self.current_value:
+            has_branched = True
+            if_stmt.if_part.stmt_list.accept(self)
+        
+        # elseifs
+        for elseif in if_stmt.elseifs:
+            if not has_branched:
+                elseif.bool_expr.accept(self)
+                if self.current_value:
+                    has_branched = True
+                    elseif.stmt_list.accept(self)
+        
+        # else
+        if if_stmt.has_else and not has_branched:
+            has_branched = True
+            if_stmt.else_stmts.accept(self)
+    
+    def visit_while_stmt(self, while_stmt):
+        for stmt in while_stmt.stmt_list.stmts:
+            while_stmt.bool_expr.accept(self)
+            if self.current_value:
+                stmt.accept(self)
+            else:
+                break
+    
+    # structs not currently supported
+    def visit_struct_decl_stmt(self, struct_decl_stmt): pass
+    
+    # user-defined functions not currently supported
+    def visit_fun_decl_stmt(self, fun_decl_stmt): pass
