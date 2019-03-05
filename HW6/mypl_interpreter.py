@@ -61,99 +61,129 @@ class Interpreter(ast.Visitor):
         if call_rvalue.fun.lexeme == 'print':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 call_rvalue.args[0].accept(self)
-                print(call_rvalue.args[0], end='')
+                
+                # realize escape codes
+                output = self.current_value
+                output = output.replace('\\n', '\n')
+                output = output.replace('\\t', '\t')
+                output = output.replace('\\b', '\b')
+                print(output, end='')
         elif call_rvalue.fun.lexeme == 'length':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 call_rvalue.args[0].accept(self)
                 if type(self.current_value) != str:
                     msg = 'this type has no length'
-                    self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                    self.__error(msg, call_rvalue.fun)
                 else:
-                    self.current_value = len(self.current_calue)
+                    self.current_value = len(self.current_value)
         elif call_rvalue.fun.lexeme == 'get':
             if len(call_rvalue.args) != 2:
                 msg = 'incorrect number of args'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 call_rvalue.args[0].accept(self)
                 arg1 = self.current_value
                 call_rvalue.args[1].accept(self)
+                arg2 = self.current_value
                 if type(self.current_value) is not str:
                     msg = 'this type cannot be indexed'
-                    self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                    self.__error(msg, call_rvalue.fun)
                 elif type(arg1) is not int:
                     msg = 'invalid index for get'
-                    self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                    self.__error(msg, call_rvalue.fun)
                 else:
-                    self.current_value = self.current_value[call_rvalue.args[0]]
+                    call_rvalue.args[0].accept(self) # get index in string
+                    self.current_value = arg2[self.current_value]
         elif call_rvalue.fun.lexeme == 'reads':
             if len(call_rvalue.args) != 0:
                 msg = 'this function takes no arguments'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 self.current_value = input()
         elif call_rvalue.fun.lexeme == 'readi':
             if len(call_rvalue.args) != 0:
                 msg = 'this function takes no arguments'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 self.current_value = int(input())
         elif call_rvalue.fun.lexeme == 'readf':
             if len(call_rvalue.args) != 0:
                 msg = 'this function takes no arguments'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 self.current_value = float(input())
         elif call_rvalue.fun.lexeme == 'itof':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 call_rvalue.args[0].accept(self)
                 if not type(self.current_value) is int:
                     msg = 'argument not of type int'
-                    self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                    self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = float(self.current_value)
         elif call_rvalue.fun.lexeme == 'itos':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 call_rvalue.args[0].accept(self)
                 if not type(self.current_value) is int:
                     msg = 'argument not of type int'
-                    self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                    self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = str(self.current_value)
         elif call_rvalue.fun.lexeme == 'ftos':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
-                self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                self.__error(msg, call_rvalue.fun)
             else:
                 call_rvalue.args[0].accept(self)
                 if not type(self.current_value) is float:
                     msg = 'argument not of type float'
-                    self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+                    self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = str(self.current_value)
+        elif call_rvalue.fun.lexeme == 'stoi':
+            if len(call_rvalue.args) != 1:
+                msg = 'incorrect number of args'
+                self.__error(msg, call_rvalue.fun)
+            else:
+                call_rvalue.args[0].accept(self)
+                if not type(self.current_value) is str:
+                    msg = 'argument not of type string'
+                    self.__error(msg, call_rvalue.fun)
+                else:
+                    self.current_value = int(self.current_value)
+        elif call_rvalue.fun.lexeme == 'stof':
+            if len(call_rvalue.args) != 1:
+                msg = 'incorrect number of args'
+                self.__error(msg, call_rvalue.fun)
+            else:
+                call_rvalue.args[0].accept(self)
+                if not type(self.current_value) is str:
+                    msg = 'argument not of type string'
+                    self.__error(msg, call_rvalue.fun)
+                else:
+                    self.current_value = float(self.current_value)
         else:
             msg = 'user-defined functions not currently supported'
-            self.__error(msg, call_rvalue.fun.line, call_rvalue.fun.column)
+            self.__error(msg, call_rvalue.fun)
     
     # sub-variables not supported because structs not currently supported
     def visit_id_rvalue(self, id_rvalue):
         if len(id_rvalue.path) > 1:
             msg = 'structs not currently supported'
-            self.__error(msg, id_rvalue.path[1].line, call_rvalue.path[1].column)
+            self.__error(msg, id_rvalue.path[1])
         else:
-            self.current_value = self.sym_table[id_rvalue.path[0]]
+            self.current_value = self.sym_table.get_info(id_rvalue.path[0].lexeme)
     
     def visit_complex_expr(self, complex_expr):
         complex_expr.first_operand.accept(self)
@@ -169,7 +199,10 @@ class Interpreter(ast.Visitor):
         elif math_rel == '*':
             self.current_value = left_value * right_value
         elif math_rel == '/':
-            self.current_value = left_value / right_value
+            if type(left_value) is int: # assuming matching types
+                self.current_value = left_value // right_value
+            else: # float
+                self.current_value = left_value / right_value
         else: # '%'
             self.current_value = left_value % right_value
     
@@ -204,7 +237,7 @@ class Interpreter(ast.Visitor):
             bool_expr.rest.accept(self)
             second_half = self.current_value
             
-            if bool_connector.tokentype == token.AND:
+            if bool_expr.bool_connector.tokentype == token.AND:
                 self.current_value = first_half and second_half
             else: # OR
                 self.current_value = first_half or second_half
@@ -215,7 +248,8 @@ class Interpreter(ast.Visitor):
     
     def visit_var_decl_stmt(self, var_decl_stmt):
         var_decl_stmt.var_expr.accept(self)
-        self.sym_table[var_decl_stmt.var_id.lexeme] = self.current_type
+        self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
+        self.sym_table.set_info(var_decl_stmt.var_id.lexeme, self.current_value)
     
     # sub-variables not supported because structs not currently supported
     def visit_assign_stmt(self, assign_stmt):
@@ -224,7 +258,7 @@ class Interpreter(ast.Visitor):
             self.__error(msg, assign_stmt.lhs.path[1].row, assign_stmt.lhs.path[1].column)
         else:
             assign_stmt.rhs.accept(self)
-            self.sym_table[assign_stmt.lhs.path[0]] = self.current_value
+            self.sym_table.set_info(assign_stmt.lhs.path[0].lexeme, self.current_value)
     
     def visit_if_stmt(self, if_stmt):
         # if it branches, then we stop checking the following elseifs/else
@@ -234,7 +268,9 @@ class Interpreter(ast.Visitor):
         if_stmt.if_part.bool_expr.accept(self)
         if self.current_value:
             has_branched = True
+            self.sym_table.push_environment()
             if_stmt.if_part.stmt_list.accept(self)
+            self.sym_table.pop_environment()
         
         # elseifs
         for elseif in if_stmt.elseifs:
@@ -242,20 +278,25 @@ class Interpreter(ast.Visitor):
                 elseif.bool_expr.accept(self)
                 if self.current_value:
                     has_branched = True
+                    self.sym_table.push_environment()
                     elseif.stmt_list.accept(self)
+                    self.sym_table.pop_environment()
         
         # else
         if if_stmt.has_else and not has_branched:
             has_branched = True
+            self.sym_table.push_environment()
             if_stmt.else_stmts.accept(self)
+            self.sym_table.pop_environment()
     
     def visit_while_stmt(self, while_stmt):
-        for stmt in while_stmt.stmt_list.stmts:
-            while_stmt.bool_expr.accept(self)
-            if self.current_value:
+        self.sym_table.push_environment()
+        while_stmt.bool_expr.accept(self)
+        while self.current_value:
+            for stmt in while_stmt.stmt_list.stmts:
                 stmt.accept(self)
-            else:
-                break
+            while_stmt.bool_expr.accept(self)
+        self.sym_table.pop_environment()
     
     # structs not currently supported
     def visit_struct_decl_stmt(self, struct_decl_stmt): pass

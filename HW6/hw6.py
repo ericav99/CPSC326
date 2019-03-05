@@ -27,7 +27,7 @@ def main(filename):
         file_stream.close()
         sys.exit(e)
 
-def main(filename):
+def hw6(file_stream):
     the_lexer = lexer.Lexer(file_stream)
     the_parser = parser.Parser(the_lexer)
     stmt_list = the_parser.parse()
