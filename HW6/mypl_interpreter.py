@@ -58,6 +58,8 @@ class Interpreter(ast.Visitor):
     # user-defined functions not currently supported
     def visit_call_rvalue(self, call_rvalue):
         # call_rvalue.fun.tokentype should be ID
+        
+        # print()
         if call_rvalue.fun.lexeme == 'print':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
@@ -71,6 +73,8 @@ class Interpreter(ast.Visitor):
                 output = output.replace('\\t', '\t')
                 output = output.replace('\\b', '\b')
                 print(output, end='')
+        
+        # length()
         elif call_rvalue.fun.lexeme == 'length':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
@@ -82,6 +86,8 @@ class Interpreter(ast.Visitor):
                     self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = len(self.current_value)
+        
+        # get()
         elif call_rvalue.fun.lexeme == 'get':
             if len(call_rvalue.args) != 2:
                 msg = 'incorrect number of args'
@@ -100,24 +106,32 @@ class Interpreter(ast.Visitor):
                 else:
                     call_rvalue.args[0].accept(self) # get index in string
                     self.current_value = arg2[self.current_value]
+        
+        # reads()
         elif call_rvalue.fun.lexeme == 'reads':
             if len(call_rvalue.args) != 0:
                 msg = 'this function takes no arguments'
                 self.__error(msg, call_rvalue.fun)
             else:
                 self.current_value = input()
+        
+        # readi()
         elif call_rvalue.fun.lexeme == 'readi':
             if len(call_rvalue.args) != 0:
                 msg = 'this function takes no arguments'
                 self.__error(msg, call_rvalue.fun)
             else:
                 self.current_value = int(input())
+        
+        # readf()
         elif call_rvalue.fun.lexeme == 'readf':
             if len(call_rvalue.args) != 0:
                 msg = 'this function takes no arguments'
                 self.__error(msg, call_rvalue.fun)
             else:
                 self.current_value = float(input())
+        
+        # itof()
         elif call_rvalue.fun.lexeme == 'itof':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
@@ -129,6 +143,8 @@ class Interpreter(ast.Visitor):
                     self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = float(self.current_value)
+        
+        # itos()
         elif call_rvalue.fun.lexeme == 'itos':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
@@ -140,6 +156,8 @@ class Interpreter(ast.Visitor):
                     self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = str(self.current_value)
+        
+        # ftos()
         elif call_rvalue.fun.lexeme == 'ftos':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
@@ -151,6 +169,8 @@ class Interpreter(ast.Visitor):
                     self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = str(self.current_value)
+        
+        # stoi()
         elif call_rvalue.fun.lexeme == 'stoi':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
@@ -162,6 +182,8 @@ class Interpreter(ast.Visitor):
                     self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = int(self.current_value)
+        
+        # stof()
         elif call_rvalue.fun.lexeme == 'stof':
             if len(call_rvalue.args) != 1:
                 msg = 'incorrect number of args'
@@ -173,6 +195,8 @@ class Interpreter(ast.Visitor):
                     self.__error(msg, call_rvalue.fun)
                 else:
                     self.current_value = float(self.current_value)
+        
+        # user-defined functions not currently supported
         else:
             msg = 'user-defined functions not currently supported'
             self.__error(msg, call_rvalue.fun)

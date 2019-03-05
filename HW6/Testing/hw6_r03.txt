@@ -1,0 +1,13 @@
+x is: 0
+y is: ab
+z is: 3.14
+3 + 4 is: 7
+3 - 4 is: -1
+5 / 2 is: 2
+5 % 2 is: 1
+3.03 + 0.11159 is: 3.14159
+3.0 - 4.0 is: -1.0
+5.0 / 2.0 is: 2.5
+'ab' + 'cd' is: abcd
+Enter a string: You entered: hello
+Enter a number: You entered: 123.0
