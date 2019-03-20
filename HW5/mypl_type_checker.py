@@ -34,7 +34,38 @@ class TypeChecker(ast.Visitor):
         self.sym_table.add_id('print')
         self.sym_table.set_info('print', [[token.STRINGTYPE], token.NIL])
         
-        # TODO: remaining function types
+        self.sym_table.add_id('length')
+        self.sym_table.set_info('length', [[token.STRINGTYPE], token.INTTYPE])
+
+        self.sym_table.add_id('get')
+        self.sym_table.set_info('get', [[token.INTTYPE, token.STRINGTYPE], token.STRINGTYPE])
+
+        self.sym_table.add_id('reads')
+        self.sym_table.set_info('reads', [[], token.STRINGTYPE])
+
+        self.sym_table.add_id('readi')
+        self.sym_table.set_info('readi', [[], token.INTTYPE])
+
+        self.sym_table.add_id('readf')
+        self.sym_table.set_info('readf', [[], token.FLOATTYPE])
+
+        self.sym_table.add_id('itos')
+        self.sym_table.set_info('itos', [[token.INTTYPE], token.STRINGTYPE])
+
+        self.sym_table.add_id('itof')
+        self.sym_table.set_info('itof', [[token.INTTYPE], token.FLOATTYPE])
+
+        self.sym_table.add_id('itob')
+        self.sym_table.set_info('itob', [[token.INTTYPE], token.BOOLTYPE])
+
+        self.sym_table.add_id('ftos')
+        self.sym_table.set_info('ftos', [[token.FLOATTYPE], token.STRINGTYPE])
+
+        self.sym_table.add_id('ftob')
+        self.sym_table.set_info('ftob', [[token.FLOATTYPE], token.BOOLTYPE])
+
+        self.sym_table.add_id('btos')
+        self.sym_table.set_info('btos', [[token.BOOLTYPE], token.STRINGTYPE])
     
     # raises a descriptive MyPLError given a simple error_msg
     def __error(self, error_msg, error_token):
@@ -58,8 +89,51 @@ class TypeChecker(ast.Visitor):
     def visit_expr_stmt(self, expr_stmt):
         expr_stmt.expr.accept(self)
     
-    def visit_var_decl_stmt(self, var_decl): pass
-        # TODO
+    def visit_var_decl_stmt(self, var_decl_stmt):
+        given_type = None
+        if var_decl_stmt.var_type != None:
+            if var_decl_stmt.var_type.tokentype == token.ID:
+                given_type = var_decl_stmt.var_type.lexeme
+            else:
+                given_type = var_decl_stmt.var_type.tokentype
+        var_decl_stmt.var_expr.accept(self)
+        expr_type = self.current_type
+        
+        # if explicitly given type and nil expression
+        if given_type != None and expr_type == token.NIL:
+            # explicitly given type overrides nil expression
+            if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
+                self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
+            if expr_type in self.struct_types:
+                self.sym_table.set_info(var_decl_stmt.var_id.lexeme, deepcopy(self.struct_types[expr_type]))
+            else:
+                self.sym_table.set_info(var_decl_stmt.var_id.lexeme, given_type)
+        # if explicitly given type and non-nil expression
+        elif given_type != None and expr_type != token.NIL:
+            # make sure they match
+            if given_type == expr_type:
+                if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
+                    self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
+                if expr_type in self.struct_types:
+                    self.sym_table.set_info(var_decl_stmt.var_id.lexeme, deepcopy(self.struct_types[expr_type]))
+                else:
+                    self.sym_table.set_info(var_decl_stmt.var_id.lexeme, given_type)
+            else:
+                msg = 'type mismatch in var declaration'
+                self.__error(msg, var_decl_stmt.var_type)
+        # if no explicitly given type
+        else: # given_type == None
+            # make sure expression is non-nil
+            if expr_type == token.NIL:
+                msg = 'nil declaraction without explicit type'
+                self.__error(msg, var_decl_stmt.var_id)
+            else:
+                if not self.sym_table.id_exists(var_decl_stmt.var_id.lexeme):
+                    self.sym_table.add_id(var_decl_stmt.var_id.lexeme)
+                if expr_type in self.struct_types:
+                    self.sym_table.set_info(var_decl_stmt.var_id.lexeme, deepcopy(self.struct_types[expr_type]))
+                else:
+                    self.sym_table.set_info(var_decl_stmt.var_id.lexeme, expr_type)
     
     def visit_assign_stmt(self, assign_stmt):
         assign_stmt.rhs.accept(self)
@@ -91,14 +165,29 @@ class TypeChecker(ast.Visitor):
     def visit_new_rvalue(self, new_rvalue):
         self.current_type = new_rvalue.struct_type.lexeme
     
-    def visit_call_rvalue(self, call_rvalue): pass
-        # TODO - get the function's return type
+    def visit_call_rvalue(self, call_rvalue):
+        if self.sym_table.id_exists(call_rvalue.fun.lexeme):
+            main_list = self.sym_table.get_info(call_rvalue.fun.lexeme)
+            if len(call_rvalue.args) != len(main_list[0]):
+                msg = 'incorrect number of arguments'
+                self.__error(msg, call_rvalue.fun)
+            else:
+                for i, argument in enumerate(call_rvalue.args):
+                    argument.accept(self)
+                    if self.current_type != main_list[0][i] and self.current_type != token.NIL:
+                        msg = 'argument type mismatch'
+                        self.__error(msg, call_rvalue.fun)
+                self.current_type = main_list[1]
+
+        else:
+            msg = 'function call before declaration'
+            self.__error(msg, call_rvalue.fun)
     
     def visit_id_rvalue(self, id_rvalue):
         if self.sym_table.id_exists(id_rvalue.path[0].lexeme):
             depth = len(id_rvalue.path)
             if depth > 1:
-                self.visit_id_rvalue.helper(id_rvalue.path[1:], self.sym_table.get_info(id_rvalue.path[0]))
+                self.visit_id_rvalue_helper(id_rvalue.path[1:], self.sym_table.get_info(id_rvalue.path[0]))
             else:
                 self.current_type = self.sym_table.get_info(id_rvalue.path[0].lexeme)
         else:
@@ -320,8 +409,32 @@ class TypeChecker(ast.Visitor):
             struct_vars[var_decl.var_id] = self.current_type
         self.sym_table.set_info(new_type, struct_vars)
     
-    # TODO: function decls and calls
-    
-    def visit_fun_decl_stmt(self, struct_decl_stmt): pass
-    
-    def visit_return_stmt(self, return_stmt): pass
+    def visit_fun_decl_stmt(self, fun_decl_stmt):
+        fun_id = fun_decl_stmt.fun_name.lexeme
+        main_list = [[]]
+        for param in fun_decl_stmt.params:
+            main_list[0].append(param.param_type.tokentype)
+        main_list.append(fun_decl_stmt.return_type.tokentype)
+        self.sym_table.add_id(fun_id)
+        self.sym_table.set_info(fun_id, main_list)
+
+        self.sym_table.push_environment()
+        for param in fun_decl_stmt.params:
+            self.sym_table.add_id(param.param_name.lexeme)
+            self.sym_table.set_info(param.param_name.lexeme, param.param_type.tokentype)
+
+        found_return_stmt = False
+        for stmt in fun_decl_stmt.stmt_list.stmts:
+            if type(stmt) is ast.ReturnStmt:
+                stmt.return_expr.accept(self)
+                if self.current_type != main_list[1]:
+                    msg = "return value doesn't match return type"
+                    self.__error(msg, stmt.return_token)
+                found_return_stmt = True
+                break
+            else:
+                stmt.accept(self)
+        if not found_return_stmt and main_list[1] != token.NIL:
+            msg = 'function missing return statement'
+            self.__error(msg, fun_decl_stmt.return_type)
+        self.sym_table.pop_environment()
