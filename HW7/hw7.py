@@ -19,7 +19,7 @@ import sys
 def main(filename):
     try:
         file_stream = open(filename, 'r')
-        hw6(file_stream)
+        hw7(file_stream)
         file_stream.close()
     except FileNotFoundError:
         sys.exit('invalid filename %s' % filename)
@@ -34,7 +34,7 @@ def hw7(file_stream):
     # the_type_checker = type_checker.TypeChecker()
     # stmt_list.accept(the_type_checker)
     the_interpreter = interpreter.Interpreter()
-    the_interpreter.run(stmt_list)
+    stmt_list.accept(the_interpreter)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
