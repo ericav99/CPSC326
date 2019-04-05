@@ -47,7 +47,7 @@ lastElem lst =
 -- Constraint: Cannot use (!!)
 elemAt :: Int -> [a] -> a
 elemAt idx lst =
-    if idx >= length lst
+    if (idx >= length lst || idx < 0)
     then error "Index out of bounds"
     else last (take (idx + 1) lst)
 
@@ -56,7 +56,7 @@ replaceInList :: [a] -> Int -> a -> [a]
 replaceInList lst idx replacement =
     let firstHalf = take idx lst
         secondHalf = drop (idx + 1) lst
-        in if idx >= length lst
+        in if (idx >= length lst || idx < 0)
         then error "Index out of bounds"
         else firstHalf ++ (replacement : secondHalf)
 
