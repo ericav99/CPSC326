@@ -1,0 +1,19 @@
+GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( hw9b.hs, interpreted )
+Ok, one module loaded.
+*Main> True
+*Main> False
+*Main> False
+*Main> True
+*Main> True
+*Main> True
+*Main> False
+*Main> False
+*Main> True
+*Main> 
+<interactive>:10:13: error:
+    • No instance for (Num Char) arising from the literal ‘1’
+    • In the expression: 1
+      In the first argument of ‘myElements’, namely ‘[1, 2, 3]’
+      In the expression: myElements [1, 2, 3] "Error"
+*Main> Leaving GHCi.

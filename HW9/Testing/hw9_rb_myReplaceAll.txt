@@ -1,0 +1,8 @@
+GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( hw9b.hs, interpreted )
+Ok, one module loaded.
+*Main> "bbdd"
+*Main> [3,3,3,4]
+*Main> []
+*Main> [1,2,3,4]
+*Main> Leaving GHCi.

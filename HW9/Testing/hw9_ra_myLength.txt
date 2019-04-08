@@ -1,0 +1,8 @@
+GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( hw9a.hs, interpreted )
+Ok, one module loaded.
+*Main> 4
+*Main> 3
+*Main> 1
+*Main> 0
+*Main> Leaving GHCi.

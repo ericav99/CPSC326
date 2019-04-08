@@ -1,0 +1,11 @@
+GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( hw9a.hs, interpreted )
+Ok, one module loaded.
+*Main> 12
+*Main> ("z",0)
+*Main> -1
+*Main> 0
+*Main> *** Exception: Empty list
+CallStack (from HasCallStack):
+  error, called at hw9a.hs:16:10 in main:Main
+*Main> Leaving GHCi.

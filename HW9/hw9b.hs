@@ -43,6 +43,7 @@ myElement t (x:xs)
 -- Constraint: Cannot use elems
 myElements :: (Eq a) => [a] -> [a] -> Bool
 myElements [] _ = True
+myElements _ [] = False -- This must come after the previous pattern
 myElements (x:xs) ys
     | myElement x ys = myElements xs ys
     | otherwise = False
@@ -53,6 +54,7 @@ myElements (x:xs) ys
 myReplace :: (Eq a) => (a, a) -> [a] -> [a]
 myReplace _ [] = []
 myReplace (t, n) (x:xs)
+    | t == n = x:xs
     | t == x = n : myReplace (t, n) xs
     | otherwise = x : myReplace (t, n) xs
 
@@ -62,22 +64,22 @@ myReplace (t, n) (x:xs)
 myReplaceAll :: (Eq a) => [(a, a)] -> [a] -> [a]
 myReplaceAll _ [] = []
 myReplaceAll [] xs = xs
-myReplaceAll rs xs = myReplaceAll (tail rs) (myReplace (head rs) xs)
+myReplaceAll (r:rs) xs = myReplaceAll rs (myReplace r xs)
 
 -- Returns the sum of all of one element in a list
 myElementSum :: (Eq a, Num a) => a -> [a] -> a
 myElementSum _ [] = 0
-myElementSum x xs
-    | not (myElement x xs) = 0
-    | head xs == x = x + myElementSum x (tail xs)
-    | otherwise = myElementSum x (tail xs)
+myElementSum t (x:xs)
+    | not (myElement t (x:xs)) = 0
+    | x == t = t + myElementSum t xs
+    | otherwise = myElementSum t xs
 
 -- Removes duplicates from a list
 removeDuplicates :: (Eq a) => [a] -> [a]
 removeDuplicates [] = []
-removeDuplicates xs
-    | myElement (head xs) (tail xs) = removeDuplicates (tail xs)
-    | otherwise = head xs : removeDuplicates (tail xs)
+removeDuplicates (x:xs)
+    | myElement x xs = removeDuplicates xs
+    | otherwise = x : removeDuplicates xs
 
 -- Sorts a list of pairs by the first item in the pair
 -- Uses merge sort
@@ -88,7 +90,7 @@ mergeSort xs =
     let halfway = length xs `div` 2
         merge [] ns = ns
         merge ms [] = ms
-        merge ms ns
-            | fst (head ms) >= (fst (head ns)) = head ns : (merge ms (tail ns))
-            | otherwise = head ms : (merge (tail ms) ns)
+        merge (m:ms) (n:ns)
+            | fst m >= (fst n) = n : (merge (m:ms) ns)
+            | otherwise = m : (merge ms (n:ns))
     in merge (mergeSort (take halfway xs)) (mergeSort (drop halfway xs))

@@ -1,0 +1,8 @@
+GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( hw9b.hs, interpreted )
+Ok, one module loaded.
+*Main> [(1,15),(2,10),(4,30)]
+*Main> [("a",30),("b",40),("c",20),("d",10)]
+*Main> [(1,0)]
+*Main> []
+*Main> Leaving GHCi.

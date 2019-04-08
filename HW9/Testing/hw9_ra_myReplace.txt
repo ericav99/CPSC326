@@ -1,0 +1,23 @@
+GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( hw9a.hs, interpreted )
+Ok, one module loaded.
+*Main> [1,8,3,8]
+*Main> [1,1,1]
+*Main> []
+*Main> [1,2,3,2]
+*Main> "Max"
+*Main> 
+<interactive>:6:12: error:
+    • Couldn't match expected type ‘Integer -> (Char, Char)’
+                  with actual type ‘Char’
+    • The function ‘'o'’ is applied to one argument,
+      but its type ‘Char’ has none
+      In the first argument of ‘myReplace’, namely ‘('o' 0)’
+      In the expression: myReplace ('o' 0) "Error"
+*Main> 
+<interactive>:7:12: error:
+    • No instance for (Num Char) arising from the literal ‘0’
+    • In the expression: 0
+      In the first argument of ‘myReplace’, namely ‘(0, 1)’
+      In the expression: myReplace (0, 1) "Error"
+*Main> Leaving GHCi.
