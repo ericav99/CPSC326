@@ -107,3 +107,14 @@ sortList (Node x next) =
             | x1 >= x2 = insertAt 0 x2 (merge (Node x1 next1) next2)
             | otherwise = insertAt 0 x1 (merge next1 (Node x2 next2))
     in merge (sortList (llTake halfway (Node x next))) (sortList (llDrop halfway (Node x next)))
+
+-- Functions like map but on linked list
+mapList :: (a -> b) -> List a -> List b
+mapList _ Nil = Nil
+mapList fun (Node x next) = Node (fun x) (mapList fun next)
+
+-- Functions like zipwith but on linked list
+zipWithList :: (a -> b -> c) -> List a -> List b -> List c
+zipWithList _ Nil _ = Nil
+zipWithList _ _ Nil = Nil
+zipWithList fun (Node x1 next1) (Node x2 next2) = Node (fun x1 x2) (zipWithList fun next1 next2)
