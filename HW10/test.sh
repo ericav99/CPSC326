@@ -17,7 +17,7 @@ ghci hw10.hs > Testing/hw10_result_delete.txt 2>&1 << END
 let list1 = Node 1 (Node 2 (Node 3 Nil))
 let list2 = Nil
 let list3 = Node "a" (Node "b" (Node "c" Nil))
-let list4 = Node 1 (Node 2 (Node 2 (Node 3 Nil)))
+let list4 = Node 2 (Node 1 (Node 2 (Node 3 Nil)))
 
 delete 2 list1
 delete 0 list1
@@ -76,6 +76,7 @@ let list3 = Node "a" (Node "b" (Node "c" Nil))
 deleteAt 0 list1
 deleteAt 2 list3
 deleteAt 3 list1
+deleteAt (-1) list1
 deleteAt 0 list2
 deleteAt 1 (deleteAt 2 list3)
 :quit
@@ -126,5 +127,6 @@ let list5 = Node 1 (Node 2 (Node 3 Nil))
 zipWithList (\x y -> x ++ y) list3 list4
 zipWithList (\x y -> x + y) list1 list5
 zipWithList (\x y -> x + y) list1 list2
+zipWithList (\x y -> x + y) list2 list1
 :quit
 END

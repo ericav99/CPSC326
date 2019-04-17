@@ -1,4 +1,4 @@
-GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+GHCi, version 8.6.4: http://www.haskell.org/ghc/  :? for help
 [1 of 1] Compiling Main             ( hw10.hs, interpreted )
 Ok, one module loaded.
 *Main> *Main> *Main> *Main> *Main> Node 0 (Node 3 (Node 5 (Node 6 (Node 7 (Node 8 (Node 9 Nil))))))
