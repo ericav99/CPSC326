@@ -1,0 +1,7 @@
+GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( hw10.hs, interpreted )
+Ok, one module loaded.
+*Main> *Main> *Main> *Main> *Main> *Main> *Main> Node "bx" (Node "ay" Nil)
+*Main> Node 9 (Node 8 (Node 10 Nil))
+*Main> Nil
+*Main> Leaving GHCi.

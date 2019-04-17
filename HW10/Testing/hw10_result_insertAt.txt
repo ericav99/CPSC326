@@ -1,0 +1,16 @@
+GHCi, version 8.2.2: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( hw10.hs, interpreted )
+Ok, one module loaded.
+*Main> *Main> *Main> *Main> *Main> Node 5 (Node 1 (Node 2 (Node 3 Nil)))
+*Main> Node "a" (Node "b" (Node "bc" (Node "c" Nil)))
+*Main> *** Exception: Index out of bounds
+CallStack (from HasCallStack):
+  error, called at hw10.hs:77:38 in main:Main
+*Main> *** Exception: Index out of bounds
+CallStack (from HasCallStack):
+  error, called at hw10.hs:76:17 in main:Main
+*Main> *** Exception: Index out of bounds
+CallStack (from HasCallStack):
+  error, called at hw10.hs:74:20 in main:Main
+*Main> Node 1.0 (Node 1.5 (Node 2.0 (Node 2.5 (Node 3.0 Nil))))
+*Main> Leaving GHCi.

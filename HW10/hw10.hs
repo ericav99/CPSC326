@@ -93,8 +93,6 @@ concatenate Nil node = node
 concatenate node Nil = node
 concatenate (Node x next) node2 = Node x (concatenate next node2)
 
-
--- let list1 = Node 8 (Node 6 (Node 7 (Node 5 (Node 3 (Node 0 (Node 9 Nil)))))) is a good test
 -- Performs merge sort on a linked list
 sortList :: (Ord a) => List a -> List a
 sortList Nil = Nil
