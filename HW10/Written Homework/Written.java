@@ -4,6 +4,7 @@
  * Assignment: 10
  * Description:
  *   Higher order function examples in Java
+ */
 
 import java.util.ArrayList;
 import java.util.Arrays;
