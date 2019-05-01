@@ -1,0 +1,5 @@
+duplicate punctuation
+Removing duplicate words, duplicate words.
+Is this affected by punctuation?
+How about a newline?
+DUPLICATE words aren't counted when the case changes.

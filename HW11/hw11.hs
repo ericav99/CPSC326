@@ -38,10 +38,10 @@ capitals xs = unwords (filter (\x -> isUpper (x !! 0)) (words xs))
 -- from the second line, and returns the modified second line
 remWords :: String -> String
 remWords input
-        | length (lines input) /= 2 = error "Format incorrect"
+        | length (lines input) < 2 = error "Format incorrect"
         | otherwise = foldl remWord sentence (words targetWords)
     where targetWords = (lines input) !! 0
-          sentence = (lines input) !! 1
+          sentence = unwords (tail (lines input))
 
 -- removes every occurrance of a target word from a sentence
 remWord :: String -> String -> String
