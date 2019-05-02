@@ -1,16 +1,4 @@
-% basic family tree information (main characters)
-child_of(anakin,shmi).
-child_of(padme,ruwee).
-child_of(padme,jobal).
-child_of(sola,ruwee).
-child_of(sola,jobal).
-child_of(ryoo,sola).
-child_of(luke,padme).
-child_of(luke,anakin).
-child_of(leia,padme).
-child_of(leia,anakin).
-child_of(kylo_ren,leia).
-child_of(kylo_ren,han).
+% usage: clingo hw11-4.lp starwars-social-network.lp
 
 % determine people in the same generation
 % the last two parts to each rule are:
@@ -28,3 +16,6 @@ same_gen(P1,P2) :- child_of(C1,P1), child_of(C2,P2), same_gen(C1,C2), C1 != C2, 
 
 % rule 4: children of parents in the same generation are in the same generation (ex. cousins)
 same_gen(C1,C2) :- child_of(C1,P1), child_of(C2,P2), same_gen(P1,P2), P1 != P2, C1 != C2, not same_gen(C2,C1).
+
+% print nice
+#show same_gen/2.
