@@ -5,10 +5,10 @@ character(P) :- person(P,_).
 character(P) :- droid(P,_).
 
 % determine how many people Character has spoken to
-conversations(C,N) :- N = #count { Other : speaks_with(C,Other); Other: speaks_with(Other, C) }, character(C).
+conversations(P,N) :- N = #count { Other : speaks_with(P,Other); Other: speaks_with(Other, P) }, character(P).
 
 % find the character with the max
-influential(C) :- C = #max { N : conversations(C,N) }, character(C).
+influential(N) :- N = #max { N : conversations(_,N) }, conversations(_,N).
 
 % print nice
 %#show conversations/2.
