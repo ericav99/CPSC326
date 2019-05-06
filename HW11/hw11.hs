@@ -21,7 +21,7 @@ interactWith function inputFile =
 main =
   do args <- getArgs
      case args of
-       [input] -> interactWith remWords input
+       [input] -> interactWith capitals input
        _ -> putStrLn "error: exactly one argument needed"
 
 -- converts every character in a string to upper case
@@ -31,7 +31,7 @@ toUpperCase xs = map toUpper xs
 -- takes a string and filters out the words that don't start
 -- with an uppercase letter
 capitals :: String -> String
-capitals xs = unwords (filter (\x -> isUpper (x !! 0)) (words xs))
+capitals xs = unwords (filter (\x -> isUpper (head x)) (words xs))
 
 -- takes a string with two lines and
 -- removes all occurrances of the words on the first line
