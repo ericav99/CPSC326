@@ -74,9 +74,29 @@ deleteMin (Node x l r) = trickleDown (deleteLast (Node (lastChild (Node x l r)) 
 lastChild :: Heap a -> a
 lastChild Nil = error "Empty Heap"
 lastChild (Node x Nil Nil) = x
+lastChild (Node _ l Nil) = lastChild l
 lastChild (Node _ _ r) = lastChild r
-lastChild (Node _ l Nil) = lastChild l -- Not sure if these functions work yet
 
 -- Helper function
 -- Removes the last child from the tree
+deleteLast :: Heap a -> Heap a
+deleteLast Nil = error "Empty Heap"
+deleteLast (Node x Nil Nil) = Nil
+deleteLast (Node x l Nil) = Node x (deleteLast l) Nil
+deleteLast (Node x l r) = Node x l (deleteLast r)
 
+-- Helper function
+-- Takes a tree with a non-smallest value at the root
+-- And recursively trickles it down until it's ordered properly
+trickleDown :: (Ord a) => Heap a -> Heap a
+trickleDown (Node x Nil Nil) = Node x Nil Nil
+trickleDown (Node x (Node y l r) Nil)
+    | y < x = Node y (trickleDown (Node x l r)) Nil
+    | otherwise = Node x (Node y l r) Nil
+trickleDown (Node x Nil (Node z l r))
+    | z < x = Node z Nil (Node x l r)
+    | otherwise = Node x Nil (Node z l r)
+trickleDown (Node x (Node y l1 r1) (Node z l2 r2))
+    | y < x = Node y (trickleDown (Node x l1 r1)) (Node z l2 r2)
+    | z < x = Node z (Node y l1 r1) (trickleDown (Node x l2 r2))
+    | otherwise = Node x (Node y l1 r1) (Node z l2 r2)
