@@ -114,6 +114,8 @@ heapSort [] = []
 heapSort [x] = [x]
 heapSort xs = dumpHeap (buildHeap xs Nil)
 
+-- Helper function
+-- Takes a heap, moves the root item to a list recursively
 dumpHeap :: (Ord a) => Heap a -> [a]
 dumpHeap Nil = []
 dumpHeap (Node x Nil Nil) = [x]

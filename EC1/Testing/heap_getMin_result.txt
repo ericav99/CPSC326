@@ -1,0 +1,10 @@
+GHCi, version 8.6.4: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( heap.hs, interpreted )
+Ok, one module loaded.
+*Main> *** Exception: Empty Heap
+CallStack (from HasCallStack):
+  error, called at heap.hs:61:14 in main:Main
+*Main> 1
+*Main> 1
+*Main> 4
+*Main> Leaving GHCi.

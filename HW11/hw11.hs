@@ -21,7 +21,7 @@ interactWith function inputFile =
 main =
   do args <- getArgs
      case args of
-       [input] -> interactWith capitals input
+       [input] -> interactWith remWords input
        _ -> putStrLn "error: exactly one argument needed"
 
 -- converts every character in a string to upper case

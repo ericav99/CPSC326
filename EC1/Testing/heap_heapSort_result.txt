@@ -1,0 +1,8 @@
+GHCi, version 8.6.4: http://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Main             ( heap.hs, interpreted )
+Ok, one module loaded.
+*Main> []
+*Main> [1]
+*Main> [1,2,3,4,5]
+*Main> "abccd"
+*Main> Leaving GHCi.
