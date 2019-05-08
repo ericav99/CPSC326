@@ -100,3 +100,21 @@ trickleDown (Node x (Node y l1 r1) (Node z l2 r2))
     | y < x = Node y (trickleDown (Node x l1 r1)) (Node z l2 r2)
     | z < x = Node z (Node y l1 r1) (trickleDown (Node x l2 r2))
     | otherwise = Node x (Node y l1 r1) (Node z l2 r2)
+
+-- Adds each value in a list to the heap
+-- foldl won't work here because of the order of insert's parameters
+buildHeap :: (Ord a) => [a] -> Heap a -> Heap a
+buildHeap [] heap = heap
+buildHeap (x:xs) heap = buildHeap xs (insert x heap)
+
+-- Performs heapsort on a list of items
+-- Adds them all to a heap, then repeatedly takes the root
+heapSort :: (Ord a) => [a] -> [a]
+heapSort [] = []
+heapSort [x] = [x]
+heapSort xs = dumpHeap (buildHeap xs Nil)
+
+dumpHeap :: (Ord a) => Heap a -> [a]
+dumpHeap Nil = []
+dumpHeap (Node x Nil Nil) = [x]
+dumpHeap heap = (getMin heap) : dumpHeap (deleteMin heap)
